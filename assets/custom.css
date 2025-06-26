@@ -1,0 +1,51 @@
+body {
+    background-color: #090d2d !important;
+
+    /*
+      IMPORTANTE: Con uno sfondo così scuro, il testo nero di default
+      diventerebbe illeggibile. Impostiamo un colore di testo chiaro
+      (es. bianco o grigio chiaro) per tutta la pagina per garantire il contrasto.
+    */
+    color: #f0f0f0;
+}
+
+/*
+  Opzionale: Per un look più integrato, possiamo modificare anche lo sfondo
+  delle card per farlo corrispondere o essere leggermente diverso.
+  La classe '.card' è usata da Dash Bootstrap Components.
+*/
+.card {
+    /* Facciamo in modo che lo sfondo della card sia leggermente più chiaro per staccare */
+    background-color: #101641 !important;
+    border: 1px solid #2a3163; /* Aggiungiamo un bordo sottile */
+}
+
+/*
+  Opzionale: Miglioriamo il contrasto degli header H4 (es. "Preset per tipo di coltura")
+*/
+h4 {
+    color: #ffffff;
+}
+
+/*
+  Opzionale: Assicuriamoci che i link e i pulsanti outline abbiano un buon colore.
+  Il tema CYBORG dovrebbe già gestirlo bene, ma questo ci dà un controllo extra.
+  La classe '.btn-outline-info' è quella che abbiamo usato per il pulsante del modale.
+*/
+.btn-outline-info {
+    color: #39CCCC; /* Colore del testo del pulsante */
+    border-color: #39CCCC; /* Colore del bordo */
+}
+
+.btn-outline-info:hover {
+    background-color: #39CCCC; /* Sfondo al passaggio del mouse */
+    color: #ffffff; /* Testo al passaggio del mouse */
+}
+
+.tall-button {
+    height: 50%;   /* Imposta l'altezza al 90% del suo contenitore (la colonna) */
+    width: 100%;   /* Occupa tutta la larghezza della sua colonna */
+    white-space: normal; /* Permette al testo di andare a capo se necessario */
+    font-size: 1rem; /* Dimensione del font, aggiustabile */
+    line-height: 1.2; /* Spaziatura tra le righe del testo */
+}
