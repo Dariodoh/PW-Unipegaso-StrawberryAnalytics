@@ -6,7 +6,7 @@ import numpy as np
 
 def genera_dati_fittizi():
     """Genera un DataFrame fittizio per l'analisi delle fragole."""
-    date_range = pd.to_datetime(pd.date_range(start="2023-04-01", end="2023-06-30"))
+    date_range = pd.to_datetime(pd.date_range(start="2023-01-01", end="2023-07-31"))
     n_records = len(date_range) * 3
 
     data = {
@@ -35,38 +35,36 @@ def genera_dati_fittizi():
 df = genera_dati_fittizi()
 
 
-def get_dati_mensili(dataframe):
+def get_calendario_colturale_fragola():
     """
-    Aggrega il DataFrame su base mensile, calcolando totali e medie.
-    Restituisce un nuovo DataFrame pronto per essere visualizzato in una tabella.
+    Restituisce un DataFrame statico con il calendario colturale della fragola
+    nel Metapontino, basato su dati reali e articoli di settore.
     """
-    if dataframe.empty:
-        return pd.DataFrame()  # Restituisce un df vuoto se non ci sono dati
+    dati_calendario = [
+        {"Mese": "Gennaio", "Peso (%)": "5%",
+         "Descrizione": "Ripresa vegetativa e avvio raccolte delle varietà più precoci"},
+        {"Mese": "Febbraio", "Peso (%)": "8%",
+         "Descrizione": "Intensificazione delle prime raccolte, piena fioritura"},
+        {"Mese": "Marzo", "Peso (%)": "18",
+         "Descrizione": "Inizio del picco produttivo per le principali cultivar come la Candonga"},
+        {"Mese": "Aprile", "Peso (%)": "28%",
+         "Descrizione": "Picco massimo della campagna di raccolta, massima richiesta di mercato"},
+        {"Mese": "Maggio", "Peso (%)": "23%",
+         "Descrizione": "Piena produzione, inizio della fase calante verso la fine del mese"},
+        {"Mese": "Giugno", "Peso (%)": "8%",
+         "Descrizione": "Raccolte tardive e conclusione della campagna di produzione"},
+        {"Mese": "Luglio", "Peso (%)": "2%",
+         "Descrizione": "Fine completa delle raccolte, estirpo delle piante e preparazione terreni"},
+        {"Mese": "Agosto", "Peso (%)": "2%",
+         "Descrizione": "Pratiche agronomiche: solarizzazione del terreno per la disinfezione"},
+        {"Mese": "Settembre", "Peso (%)": "2%",
+         "Descrizione": "Preparazione del suolo e inizio trapianti per il nuovo ciclo produttivo"},
+        {"Mese": "Ottobre", "Peso (%)": "2%",
+         "Descrizione": "Fase principale dei trapianti delle nuove piantine radicate"},
+        {"Mese": "Novembre", "Peso (%)": "1%", "Descrizione": "Sviluppo vegetativo iniziale delle nuove piante"},
+        {"Mese": "Dicembre", "Peso (%)": "1%",
+         "Descrizione": "Fase di riposo vegetativo o crescita minima in attesa della ripresa"},
+    ]
 
-    df_mensile = dataframe.copy()
-    df_mensile['Mese'] = df_mensile['Data'].dt.to_period('M')
-
-    # Aggregazione
-    summary = df_mensile.groupby('Mese').agg(
-        Raccolto_Totale_kg=('Quantità Raccolta (kg)', 'sum'),
-        Ricavo_Totale_Euro=('Ricavo (€)', 'sum'),
-        Profitto_Totale_Euro=('Profitto (€)', 'sum'),
-        Prezzo_Medio_Euro_kg=('Prezzo Vendita (€/kg)', 'mean')
-    ).reset_index()
-
-    # Formattazione per la visualizzazione
-    summary['Mese'] = summary['Mese'].dt.strftime('%B %Y')  # Formato "Mese Anno"
-    summary['Raccolto_Totale_kg'] = summary['Raccolto_Totale_kg'].round(0).astype(int)
-    summary['Ricavo_Totale_Euro'] = summary['Ricavo_Totale_Euro'].round(0).astype(int)
-    summary['Profitto_Totale_Euro'] = summary['Profitto_Totale_Euro'].round(0).astype(int)
-    summary['Prezzo_Medio_Euro_kg'] = summary['Prezzo_Medio_Euro_kg'].round(2)
-
-    # Rinomina colonne per chiarezza
-    summary.rename(columns={
-        'Raccolto_Totale_kg': 'Raccolto (kg)',
-        'Ricavo_Totale_Euro': 'Ricavo (€)',
-        'Profitto_Totale_Euro': 'Profitto (€)',
-        'Prezzo_Medio_Euro_kg': 'Prezzo Medio (€/kg)'
-    }, inplace=True)
-
-    return summary
+    df_calendario = pd.DataFrame(dati_calendario)
+    return df_calendario

@@ -49,3 +49,8 @@ h4 {
     font-size: 1rem; /* Dimensione del font, aggiustabile */
     line-height: 1.2; /* Spaziatura tra le righe del testo */
 }
+
+#contenuto-tabella-mensile thead {
+  background-color: #212529; /* Un colore di sfondo scuro standard */
+  color: #ffffff;            /* Testo bianco per un buon contrasto */
+}
