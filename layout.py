@@ -1,15 +1,34 @@
+# file: layout.py
+
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from app import app  # Importa l'istanza 'app' per usare le risorse (es. logo)
 
 
 # --- Funzione Helper per creare i dropdown in modo pulito ---
-# Questo aiuta a non ripetere lo stesso codice per ogni dropdown.
-def create_dropdown(title, control_id):
-    """Crea un label e un dropdown per il pannello di controllo."""
+# MODIFICATA per accettare un ID opzionale per un pulsante info
+def create_dropdown(title, control_id, info_button_id=None):
+    """
+    Crea un label (con un pulsante info opzionale) e un dropdown.
+    """
+    # Il titolo ora può contenere più elementi (label + bottone)
+    label_content = [html.Label(f"{title}:")]
+    if info_button_id:
+        # Se viene fornito un ID, aggiungiamo un piccolo pulsante 'i'
+        label_content.append(
+            dbc.Button(
+                "i",
+                id=info_button_id,
+                size="sm",
+                color="info",
+                className="rounded-circle ms-2 info-button-custom",
+                n_clicks=0,
+            )
+        )
+
     return dbc.Col(
         html.Div([
-            html.Label(f"{title}:"),
+            html.Div(label_content, className="d-flex align-items-center"),  # Allinea label e bottone
             dcc.Dropdown(
                 id=control_id,
                 options=[
@@ -17,29 +36,26 @@ def create_dropdown(title, control_id):
                     {'label': 'Valore Medio', 'value': 'medium'},
                     {'label': 'Valore Alto', 'value': 'high'},
                 ],
-                value='medium',  # Valore di default
+                value='medium',
                 clearable=False,
-                className="dropdown-dark"  # Classe custom per lo stile se necessario
+                className="dropdown-dark"
             )
         ]),
-        width=4  # 3 dropdown per riga (4*3 = 12 colonne)
+        width=4
     )
 
 
 # --- Definizione del Layout Principale ---
-# L'intera app è contenuta in un dbc.Container fluido per occupare tutta la larghezza.
 layout = dbc.Container([
-
-    # 1. Header con Logo Centrato
+    # ... (header, card e la prima riga di dropdown rimangono invariati) ...
     dbc.Row([
         dbc.Col(
-            html.Img(src=app.get_asset_url('logo.png'), height="200px"),
-            width=48,
+            html.Img(src=app.get_asset_url('logo.png'), height="80px"),
+            width=12,
             className="mb-4 mt-4 d-flex justify-content-center"
         )
     ]),
 
-    # 2. Pannello di Controllo con i 9 Dropdown
     dbc.Card(
         dbc.CardBody([
             dbc.Row([
@@ -52,8 +68,15 @@ layout = dbc.Container([
                 create_dropdown("Controllo Patogeni", "dd-patogeni"),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta"),
             ], className="mb-3"),
+            # --- MODIFICA QUI ---
+            # Chiamiamo la funzione create_dropdown per "Impollinazione Controllata"
+            # passando il nuovo argomento 'info_button_id'.
             dbc.Row([
-                create_dropdown("Impollinazione Controllata", "dd-impollinazione"),
+                create_dropdown(
+                    "Impollinazione Controllata",
+                    "dd-impollinazione",
+                    info_button_id="btn-info-impollinazione"  # <-- NUOVO
+                ),
                 create_dropdown("Densità di Coltivazione", "dd-densita"),
                 create_dropdown("Numero di Impianti", "dd-impianti"),
             ])
@@ -61,9 +84,8 @@ layout = dbc.Container([
         className="mb-4"
     ),
 
-    # 3. Pulsanti di Preset e Azioni Rapide
+    # ... (Tutto il resto del layout rimane invariato) ...
     dbc.Row([
-        # Colonna per il primo gruppo di preset
         dbc.Col([
             html.H4("Preset per tipo di coltura"),
             dbc.ButtonGroup([
@@ -71,9 +93,7 @@ layout = dbc.Container([
                 dbc.Button("Soilless", id="btn-preset-soilless", n_clicks=0, outline=True, color="secondary"),
                 dbc.Button("Idroponica", id="btn-preset-idroponica", n_clicks=0, outline=True, color="secondary"),
             ])
-        ], width=5),  # Occupiamo 5/12 della larghezza
-
-        # Colonna per il secondo gruppo di preset
+        ], width=5),
         dbc.Col([
             html.H4("Preset per condizioni"),
             dbc.ButtonGroup([
@@ -81,9 +101,7 @@ layout = dbc.Container([
                 dbc.Button("Medie", id="btn-preset-medie", n_clicks=0, outline=True, color="secondary"),
                 dbc.Button("Ottimali", id="btn-preset-ottimali", n_clicks=0, outline=True, color="secondary"),
             ])
-        ], width=5),  # Occupiamo altri 5/12 della larghezza
-
-        # Colonna destra per il pulsante singolo "alto"
+        ], width=5),
         dbc.Col([
             dbc.Button(
                 "Distribuzione Mensile",
@@ -91,72 +109,49 @@ layout = dbc.Container([
                 n_clicks=0,
                 outline=True,
                 color="info",
-                className="tall-button"  # Usiamo ancora la classe CSS per l'altezza
+                className="tall-button"
             )
-        ],
-            width=2,  # Occupiamo i restanti 2/12
-            # Applichiamo flexbox per centrare il pulsante verticalmente
-            className="d-flex align-items-center"
-        )
-    ],
-        # Applichiamo flexbox alla riga intera per allineare verticalmente tutte le colonne
-        # 'align-items-stretch' è l'impostazione predefinita, ma esplicitarla aiuta
-        # 'align-items-end' potrebbe essere un'alternativa se vogliamo allineare tutto in basso
-        align="center",
-        className="mb-4"
-    ),
+        ], width=2, className="d-flex align-items-center")
+    ], align="center", className="mb-4"),
 
-    html.Hr(),  # Linea di separazione
-
-    # 4. Selettore Vista Grafico (Tabs) e Area Contenuti
+    html.Hr(),
     dcc.Tabs(id="tabs-viste-grafici", value='tab-produttivo', children=[
         dcc.Tab(label='Andamento Produttivo', value='tab-produttivo'),
         dcc.Tab(label='Uso delle Risorse', value='tab-risorse'),
         dcc.Tab(label='Performance Finanziaria', value='tab-finanziaria'),
     ], className="mb-3"),
-
-    # Riga che contiene spiegazione e grafico
     dbc.Row([
-        # Colonna sinistra per la spiegazione del grafico
         dbc.Col([
-            dbc.Card(
-                dbc.CardBody([
-                    html.H4("Spiegazione del Grafico", id="titolo-spiegazione"),
-                    html.Hr(),
-                    dcc.Markdown(id="testo-spiegazione",
-                                 children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
-                ])
-            )
+            dbc.Card(dbc.CardBody([
+                html.H4("Spiegazione del Grafico", id="titolo-spiegazione"),
+                html.Hr(),
+                dcc.Markdown(id="testo-spiegazione",
+                             children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
+            ]))
         ], width=3),
-
-        # Colonna destra per il grafico principale
         dbc.Col([
-            dbc.Card(
-                dbc.CardBody([
-                    # Il grafico vero e proprio sarà inserito qui dalla callback
-                    dcc.Graph(id='grafico-principale', style={'height': '50vh'})
-                ])
-            )
+            dbc.Card(dbc.CardBody([
+                dcc.Graph(id='grafico-principale', style={'height': '50vh'})
+            ]))
         ], width=9)
     ]),
 
-    # 5. Modale (Pop-up) per la tabella mensile. Invisibile di default.
-    dbc.Modal(
-        [
-            dbc.ModalHeader(dbc.ModalTitle("Distribuzione Mensile della Produzione")),
-            dbc.ModalBody(
-                # Il contenuto (la tabella) sarà inserito qui dalla callback
-                id="contenuto-tabella-mensile"
-            ),
-            dbc.ModalFooter(
-                dbc.Button(
-                    "Chiudi", id="btn-chiudi-modale", className="ms-auto", n_clicks=0
-                )
-            ),
-        ],
-        id="modale-tabella-mensile",
-        size="lg",  # Dimensioni del pop-up: "sm", "lg", "xl"
-        is_open=False,  # Il modale è chiuso di default
+    # Modale per la tabella mensile (esistente)
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Distribuzione Mensile della Produzione")),
+        dbc.ModalBody(id="contenuto-tabella-mensile"),
+        dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modale", className="ms-auto", n_clicks=0)),
+    ], id="modale-tabella-mensile", size="xl", is_open=False),
+
+    # --- NUOVO MODALE PER L'INFO IMPOLLINAZIONE ---
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Info: Impollinazione Controllata con Bombi")),
+        dbc.ModalBody(id="contenuto-info-impollinazione"),  # Corpo con ID univoco
+        dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modal-impollinazione", n_clicks=0)),
+    ],
+        id="modal-info-impollinazione",  # ID univoco per il modale
+        size="xl",
+        is_open=False,
     ),
 
 ], fluid=True)

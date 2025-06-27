@@ -54,3 +54,18 @@ h4 {
   background-color: #212529; /* Un colore di sfondo scuro standard */
   color: #ffffff;            /* Testo bianco per un buon contrasto */
 }
+
+.info-button-custom {
+  height: 25px !important;       /* Altezza fissa */
+  width: 25px !important;        /* Larghezza fissa (uguale all'altezza) */
+  padding: 0 !important;         /* Rimuove il padding di default che deforma il pulsante */
+
+  /* Utilizziamo Flexbox per centrare perfettamente la 'i' */
+  display: flex !important;
+  justify-content: center !important; /* Centra orizzontalmente */
+  align-items: center !important;   /* Centra verticalmente */
+
+  /* Stile del testo */
+  color: white !important;
+  font-weight: bold !important;
+}
