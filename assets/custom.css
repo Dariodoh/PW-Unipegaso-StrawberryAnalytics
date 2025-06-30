@@ -1,71 +1,100 @@
-body {
-    background-color: #090d2d !important;
-
-    /*
-      IMPORTANTE: Con uno sfondo così scuro, il testo nero di default
-      diventerebbe illeggibile. Impostiamo un colore di testo chiaro
-      (es. bianco o grigio chiaro) per tutta la pagina per garantire il contrasto.
-    */
-    color: #f0f0f0;
-}
+/* file: assets/custom.css */
 
 /*
-  Opzionale: Per un look più integrato, possiamo modificare anche lo sfondo
-  delle card per farlo corrispondere o essere leggermente diverso.
-  La classe '.card' è usata da Dash Bootstrap Components.
+  ==============================================================
+  Stile Globale per il Tema Chiaro a Gradiente
+  ==============================================================
+*/
+body {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 350px, #7eb671 100%) !important;
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100vh;
+    color: #495b52;
+}
+
+
+/*
+  ==============================================================
+  Stile per le Card - Effetto "Vetro Smerigliato"
+  ==============================================================
 */
 .card {
-    /* Facciamo in modo che lo sfondo della card sia leggermente più chiaro per staccare */
-    background-color: #101641 !important;
-    border: 1px solid #2a3163; /* Aggiungiamo un bordo sottile */
+    background-color: rgba(255, 255, 255, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
 }
 
+
 /*
-  Opzionale: Miglioriamo il contrasto degli header H4 (es. "Preset per tipo di coltura")
+  ==============================================================
+  Stili per i Componenti Specifici (aggiornati per il tema chiaro)
+  ==============================================================
 */
+
 h4 {
-    color: #ffffff;
+    color: #495b52 !important;
 }
 
-/*
-  Opzionale: Assicuriamoci che i link e i pulsanti outline abbiano un buon colore.
-  Il tema CYBORG dovrebbe già gestirlo bene, ma questo ci dà un controllo extra.
-  La classe '.btn-outline-info' è quella che abbiamo usato per il pulsante del modale.
-*/
-.btn-outline-info {
-    color: #39CCCC; /* Colore del testo del pulsante */
-    border-color: #39CCCC; /* Colore del bordo */
+.custom-button-green {
+    background-color: #7eb671 !important;
+    border-color: #7eb671 !important;
+    color: white !important;
 }
 
-.btn-outline-info:hover {
-    background-color: #39CCCC; /* Sfondo al passaggio del mouse */
-    color: #ffffff; /* Testo al passaggio del mouse */
+.custom-button-green:hover {
+    background-color: #495b52 !important;
+    border-color: #495b52 !important;
+    color: white !important;
 }
 
-.tall-button {
-    height: 50%;   /* Imposta l'altezza al 90% del suo contenitore (la colonna) */
-    width: 100%;   /* Occupa tutta la larghezza della sua colonna */
-    white-space: normal; /* Permette al testo di andare a capo se necessario */
-    font-size: 1rem; /* Dimensione del font, aggiustabile */
-    line-height: 1.2; /* Spaziatura tra le righe del testo */
-}
-
-#contenuto-tabella-mensile thead {
-  background-color: #212529; /* Un colore di sfondo scuro standard */
-  color: #ffffff;            /* Testo bianco per un buon contrasto */
-}
-
+/* Pulsante Info 'i' */
 .info-button-custom {
-  height: 25px !important;       /* Altezza fissa */
-  width: 25px !important;        /* Larghezza fissa (uguale all'altezza) */
-  padding: 0 !important;         /* Rimuove il padding di default che deforma il pulsante */
-
-  /* Utilizziamo Flexbox per centrare perfettamente la 'i' */
+  height: 25px !important;
+  width: 25px !important;
+  padding: 0 !important;
   display: flex !important;
-  justify-content: center !important; /* Centra orizzontalmente */
-  align-items: center !important;   /* Centra verticalmente */
-
-  /* Stile del testo */
+  justify-content: center !important;
+  align-items: center !important;
   color: white !important;
   font-weight: bold !important;
+  background-color: #495b52 !important;
+  border-color: #495b52 !important;
+  color: white !important;
+}
+
+.info-button-custom:hover {
+    /* Rendiamolo leggermente più scuro al passaggio del mouse */
+    background-color: #3a4941 !important;
+    border-color: #3a4941 !important;
+}
+
+.custom-dropdown {
+  position: relative;
+  z-index: 100;
+}
+
+/* Header della tabella nel modale */
+#contenuto-tabella-mensile thead {
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+/*
+  ==============================================================
+  NUOVO: Stile Personalizzato per le Schede (Tabs)
+  ==============================================================
+*/
+
+/* Stile per la scheda ATTIVA */
+.tab--selected {
+  color: #495b52 !important;
+  font-weight: bold !important;
+  border-top: 3px solid #495b52 !important;
+}
+
+
+.tab:not(.tab--selected):hover {
+    border-top: 3px solid #aab8b1 !important;
 }

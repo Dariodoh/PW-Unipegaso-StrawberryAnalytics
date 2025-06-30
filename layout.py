@@ -6,7 +6,6 @@ from app import app  # Importa l'istanza 'app' per usare le risorse (es. logo)
 
 
 # --- Funzione Helper per creare i dropdown in modo pulito ---
-# MODIFICATA per accettare un ID opzionale per un pulsante info
 def create_dropdown(title, control_id, info_button_id=None):
     """
     Crea un label (con un pulsante info opzionale) e un dropdown.
@@ -17,18 +16,14 @@ def create_dropdown(title, control_id, info_button_id=None):
         # Se viene fornito un ID, aggiungiamo un piccolo pulsante 'i'
         label_content.append(
             dbc.Button(
-                "i",
-                id=info_button_id,
-                size="sm",
-                color="info",
-                className="rounded-circle ms-2 info-button-custom",
-                n_clicks=0,
+                "info", id=info_button_id, size="sm", color="info",
+                className="rounded-circle ms-2 info-button-custom", n_clicks=0,
             )
         )
 
     return dbc.Col(
         html.Div([
-            html.Div(label_content, className="d-flex align-items-center"),  # Allinea label e bottone
+            html.Div(label_content, className="d-flex align-items-center mb-2"),  # Allinea label e bottone
             dcc.Dropdown(
                 id=control_id,
                 options=[
@@ -38,7 +33,7 @@ def create_dropdown(title, control_id, info_button_id=None):
                 ],
                 value='medium',
                 clearable=False,
-                className="dropdown-dark"
+                className="custom-dropdown"
             )
         ]),
         width=4
@@ -50,7 +45,7 @@ layout = dbc.Container([
     # ... (header, card e la prima riga di dropdown rimangono invariati) ...
     dbc.Row([
         dbc.Col(
-            html.Img(src=app.get_asset_url('logo.png'), height="80px"),
+            html.Img(src=app.get_asset_url('logo.jpg'), height="300px"),
             width=12,
             className="mb-4 mt-4 d-flex justify-content-center"
         )
@@ -68,14 +63,13 @@ layout = dbc.Container([
                 create_dropdown("Controllo Patogeni", "dd-patogeni"),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta"),
             ], className="mb-3"),
-            # --- MODIFICA QUI ---
             # Chiamiamo la funzione create_dropdown per "Impollinazione Controllata"
             # passando il nuovo argomento 'info_button_id'.
             dbc.Row([
                 create_dropdown(
                     "Impollinazione Controllata",
                     "dd-impollinazione",
-                    info_button_id="btn-info-impollinazione"  # <-- NUOVO
+                    info_button_id="btn-info-impollinazione"
                 ),
                 create_dropdown("Densità di Coltivazione", "dd-densita"),
                 create_dropdown("Numero di Impianti", "dd-impianti"),
@@ -84,37 +78,41 @@ layout = dbc.Container([
         className="mb-4"
     ),
 
-    # ... (Tutto il resto del layout rimane invariato) ...
     dbc.Row([
+        # Colonna per il primo gruppo di preset
         dbc.Col([
             html.H4("Preset per tipo di coltura"),
             dbc.ButtonGroup([
-                dbc.Button("Tradizionale", id="btn-preset-tradizionale", n_clicks=0, outline=True, color="secondary"),
-                dbc.Button("Soilless", id="btn-preset-soilless", n_clicks=0, outline=True, color="secondary"),
-                dbc.Button("Idroponica", id="btn-preset-idroponica", n_clicks=0, outline=True, color="secondary"),
+                dbc.Button("Tradizionale", id="btn-preset-tradizionale", n_clicks=0, className="custom-button-green"),
+                dbc.Button("Soilless", id="btn-preset-soilless", n_clicks=0, className="custom-button-green"),
+                dbc.Button("Idroponica", id="btn-preset-idroponica", n_clicks=0, className="custom-button-green"),
             ])
         ], width=5),
+
+        # Colonna per il secondo gruppo di preset
         dbc.Col([
             html.H4("Preset per condizioni"),
             dbc.ButtonGroup([
-                dbc.Button("Sfavorevoli", id="btn-preset-sfavorevoli", n_clicks=0, outline=True, color="secondary"),
-                dbc.Button("Medie", id="btn-preset-medie", n_clicks=0, outline=True, color="secondary"),
-                dbc.Button("Ottimali", id="btn-preset-ottimali", n_clicks=0, outline=True, color="secondary"),
+                dbc.Button("Sfavorevoli", id="btn-preset-sfavorevoli", n_clicks=0, className="custom-button-green"),
+                dbc.Button("Medie", id="btn-preset-medie", n_clicks=0, className="custom-button-green"),
+                dbc.Button("Ottimali", id="btn-preset-ottimali", n_clicks=0, className="custom-button-green"),
             ])
         ], width=5),
+
+        # Colonna per il pulsante singolo
         dbc.Col([
-            dbc.Button(
-                "Distribuzione Mensile",
-                id="btn-distribuzione-mensile",
-                n_clicks=0,
-                outline=True,
-                color="info",
-                className="tall-button"
-            )
-        ], width=2, className="d-flex align-items-center")
-    ], align="center", className="mb-4"),
+            dbc.Button("Distribuzione Mensile", id="btn-distribuzione-mensile", n_clicks=0,
+                       className="custom-button-green")
+        ], width=2)
+
+    ],
+        align="end",
+        className="mb-4"
+    ),
 
     html.Hr(),
+
+
     dcc.Tabs(id="tabs-viste-grafici", value='tab-produttivo', children=[
         dcc.Tab(label='Andamento Produttivo', value='tab-produttivo'),
         dcc.Tab(label='Uso delle Risorse', value='tab-risorse'),
