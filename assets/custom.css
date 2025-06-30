@@ -59,15 +59,15 @@ h4 {
   align-items: center !important;
   color: white !important;
   font-weight: bold !important;
-  background-color: #495b52 !important;
-  border-color: #495b52 !important;
+  background-color: #7eb671 !important;
+  border-color: #7eb671 !important;
   color: white !important;
 }
 
 .info-button-custom:hover {
     /* Rendiamolo leggermente più scuro al passaggio del mouse */
-    background-color: #3a4941 !important;
-    border-color: #3a4941 !important;
+    background-color: #495b52 !important;
+    border-color: #495b52 !important;
 }
 
 .dropdown-panel-card {
@@ -75,10 +75,28 @@ h4 {
   z-index: 2;
 }
 
-/* Header della tabella nel modale */
 #contenuto-tabella-mensile thead {
-  background-color: #343a40;
-  color: #ffffff;
+  display: table-header-group !important;
+  vertical-align: middle;
+  border-color: inherit;
+  visibility: visible !important;
+}
+
+#contenuto-tabella-mensile th {
+    background-color: #7eb671 !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-bottom-width: 2px !important;
+}
+
+#btn-chiudi-modale, #btn-chiudi-modal-impollinazione {
+    background-color: #7eb671 !important;
+    border-color: #7eb671 !important;
+    color: white !important;
+}
+#btn-chiudi-modale:hover, #btn-chiudi-modal-impollinazione:hover {
+    background-color: #495b52 !important;
+    border-color: #495b52 !important;
 }
 
 /*

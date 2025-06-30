@@ -62,8 +62,6 @@ layout = dbc.Container([
                 create_dropdown("Controllo Patogeni", "dd-patogeni"),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta"),
             ], className="mb-3"),
-            # Chiamiamo la funzione create_dropdown per "Impollinazione Controllata"
-            # passando il nuovo argomento 'info_button_id'.
             dbc.Row([
                 create_dropdown(
                     "Impollinazione Controllata",

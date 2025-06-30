@@ -45,7 +45,7 @@ def get_calendario_colturale_fragola():
          "Descrizione": "Ripresa vegetativa e avvio raccolte delle varietà più precoci"},
         {"Mese": "Febbraio", "Peso (%)": "8%",
          "Descrizione": "Intensificazione delle prime raccolte, piena fioritura"},
-        {"Mese": "Marzo", "Peso (%)": "18",
+        {"Mese": "Marzo", "Peso (%)": "18%",
          "Descrizione": "Inizio del picco produttivo per le principali cultivar come la Candonga"},
         {"Mese": "Aprile", "Peso (%)": "28%",
          "Descrizione": "Picco massimo della campagna di raccolta, massima richiesta di mercato"},
@@ -67,4 +67,11 @@ def get_calendario_colturale_fragola():
     ]
 
     df_calendario = pd.DataFrame(dati_calendario)
+
+    df_calendario.rename(columns={
+        'Mese': 'Mese',
+        'Peso': 'Peso (%)',
+        'Descrizione': 'Descrizione Attività'
+    }, inplace=True)
+
     return df_calendario
