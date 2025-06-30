@@ -54,7 +54,7 @@ layout = dbc.Container([
         dbc.CardBody([
             dbc.Row([
                 create_dropdown("Temperatura", "dd-temperatura"),
-                create_dropdown("Luce", "dd-luce"),
+                create_dropdown("Irraggiamento solare", "dd-luce"),
                 create_dropdown("Irrigazione", "dd-irrigazione"),
             ], className="mb-3"),
             dbc.Row([
