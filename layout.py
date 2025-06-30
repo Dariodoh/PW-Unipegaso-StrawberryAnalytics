@@ -55,12 +55,12 @@ layout = dbc.Container([
             dbc.Row([
                 create_dropdown("Temperatura", "dd-temperatura"),
                 create_dropdown("Luce", "dd-luce"),
-                create_dropdown("Irrigazione", "dd-irrigazione"),
+                create_dropdown("Umidità", "dd-umidita"),
             ], className="mb-3"),
             dbc.Row([
+                create_dropdown("Irrigazione", "dd-irrigazione"),
                 create_dropdown("Fertilizzazione", "dd-fertilizzazione"),
                 create_dropdown("Controllo Patogeni", "dd-patogeni"),
-                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta"),
             ], className="mb-3"),
             dbc.Row([
                 create_dropdown(
@@ -69,7 +69,7 @@ layout = dbc.Container([
                     info_button_id="btn-info-impollinazione"
                 ),
                 create_dropdown("Densità di Coltivazione", "dd-densita"),
-                create_dropdown("Numero di Impianti", "dd-impianti"),
+                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta"),
             ])
         ]),
         className="mb-4 dropdown-panel-card"
