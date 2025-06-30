@@ -70,9 +70,9 @@ h4 {
     border-color: #3a4941 !important;
 }
 
-.custom-dropdown {
+.dropdown-panel-card {
   position: relative;
-  z-index: 100;
+  z-index: 2;
 }
 
 /* Header della tabella nel modale */

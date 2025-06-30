@@ -32,8 +32,7 @@ def create_dropdown(title, control_id, info_button_id=None):
                     {'label': 'Valore Alto', 'value': 'high'},
                 ],
                 value='medium',
-                clearable=False,
-                className="custom-dropdown"
+                clearable=False
             )
         ]),
         width=4
@@ -75,7 +74,7 @@ layout = dbc.Container([
                 create_dropdown("Numero di Impianti", "dd-impianti"),
             ])
         ]),
-        className="mb-4"
+        className="mb-4 dropdown-panel-card"
     ),
 
     dbc.Row([
