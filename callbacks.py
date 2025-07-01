@@ -10,37 +10,35 @@ from data import get_calendario_colturale_fragola  # Importiamo la NUOVA funzion
 
 
 PRESETS = {
-    # Preset per tipo di coltura
     "btn-preset-tradizionale": {
-        'dd-temperatura': 'high', 'dd-luce': 'medium', 'dd-umidita': 'medium',
-        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'medium',
-        'dd-impollinazione': 'low', 'dd-densita': 'low', 'dd-frequenza-raccolta': 'medium'
+        'dd-temperatura': 'sub-freddo', 'dd-luce': 'media', 'dd-irrigazione': 'aspersione',
+        'dd-fertilizzazione': 'organica', 'dd-patogeni': 'convenzionale', 'dd-frequenza-raccolta': 'media',
+        'dd-impollinazione': 'naturale', 'dd-densita': 'bassa', 'dd-umidita': 'alta_rischiosa'
     },
     "btn-preset-soilless": {
-        'dd-temperatura': 'medium', 'dd-luce': 'high', 'dd-umidita': 'medium',
-        'dd-irrigazione': 'medium', 'dd-fertilizzazione': 'medium', 'dd-patogeni': 'high',
-        'dd-impollinazione': 'high', 'dd-densita': 'high', 'dd-frequenza-raccolta': 'high'
+        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-irrigazione': 'goccia',
+        'dd-fertilizzazione': 'idroponica', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'alta',
+        'dd-impollinazione': 'bombi', 'dd-densita': 'alta', 'dd-umidita': 'ottimale'
     },
     "btn-preset-idroponica": {
-        'dd-temperatura': 'medium', 'dd-luce': 'high', 'dd-umidita': 'medium',
-        'dd-irrigazione': 'low', 'dd-fertilizzazione': 'low', 'dd-patogeni': 'high',
-        'dd-impollinazione': 'medium', 'dd-densita': 'high',  'dd-frequenza-raccolta': 'high'
+        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-irrigazione': 'goccia',
+        'dd-fertilizzazione': 'idroponica', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'alta',
+        'dd-impollinazione': 'bombi', 'dd-densita': 'alta', 'dd-umidita': 'ottimale'
     },
-    # Preset per condizioni
     "btn-preset-sfavorevoli": {
-        'dd-temperatura': 'low', 'dd-luce': 'low', 'dd-umidita': 'low',
-        'dd-irrigazione': 'low', 'dd-fertilizzazione': 'low', 'dd-patogeni': 'low',
-        'dd-impollinazione': 'low', 'dd-densita': 'low', 'dd-frequenza-raccolta': 'low'
+        'dd-temperatura': 'critico', 'dd-luce': 'bassa', 'dd-irrigazione': 'manuale',
+        'dd-fertilizzazione': 'organica', 'dd-patogeni': 'convenzionale', 'dd-frequenza-raccolta': 'bassa',
+        'dd-impollinazione': 'manuale', 'dd-densita': 'bassa', 'dd-umidita': 'alta_rischiosa'
     },
     "btn-preset-medie": {
-        'dd-temperatura': 'medium', 'dd-luce': 'medium', 'dd-umidita': 'medium',
-        'dd-irrigazione': 'medium', 'dd-fertilizzazione': 'medium', 'dd-patogeni': 'medium',
-        'dd-impollinazione': 'medium', 'dd-densita': 'medium', 'dd-frequenza-raccolta': 'medium'
+        'dd-temperatura': 'sub-caldo', 'dd-luce': 'media', 'dd-irrigazione': 'goccia',
+        'dd-fertilizzazione': 'fertirrigazione', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'media',
+        'dd-impollinazione': 'naturale', 'dd-densita': 'media', 'dd-umidita': 'alta_rischiosa'
     },
     "btn-preset-ottimali": {
-        'dd-temperatura': 'high', 'dd-luce': 'high', 'dd-umidita': 'high',
-        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'high',
-        'dd-impollinazione': 'high', 'dd-densita': 'high', 'dd-frequenza-raccolta': 'high'
+        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-irrigazione': 'goccia',
+        'dd-fertilizzazione': 'fertirrigazione', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'alta',
+        'dd-impollinazione': 'bombi', 'dd-densita': 'alta', 'dd-umidita': 'ottimale'
     }
 }
 

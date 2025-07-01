@@ -6,7 +6,7 @@ from app import app  # Importa l'istanza 'app' per usare le risorse (es. logo)
 
 
 # --- Funzione Helper per creare i dropdown in modo pulito ---
-def create_dropdown(title, control_id, info_button_id=None):
+def create_dropdown(title, control_id, options, default_value, info_button_id=None):
     """
     Crea un label (con un pulsante info opzionale) e un dropdown.
     """
@@ -23,21 +23,65 @@ def create_dropdown(title, control_id, info_button_id=None):
 
     return dbc.Col(
         html.Div([
-            html.Div(label_content, className="d-flex align-items-center mb-2"),  # Allinea label e bottone
+            html.Div(label_content, className="d-flex align-items-center mb-2"),
             dcc.Dropdown(
                 id=control_id,
-                options=[
-                    {'label': 'Valore Basso', 'value': 'low'},
-                    {'label': 'Valore Medio', 'value': 'medium'},
-                    {'label': 'Valore Alto', 'value': 'high'},
-                ],
-                value='medium',
+                options=options,
+                value=default_value,
                 clearable=False
             )
         ]),
         width=4
     )
 
+# --- Definiamo qui le opzioni per i dropdown ---
+OPTIONS_TEMPERATURA = [
+    {'label': '18-24°C', 'value': 'ottimale'},
+    {'label': '12-17°C', 'value': 'sub-freddo'},
+    {'label': '25-29°C', 'value': 'sub-caldo'},
+    {'label': '<12°C', 'value': 'critico-freddo'},
+    {'label': '>29°C', 'value': 'critico-caldo'},
+]
+OPTIONS_LUCE = [
+    {'label': '> 12 ore/giorno', 'value': 'alta'},
+    {'label': '8-12 ore/giorno', 'value': 'media'},
+    {'label': '< 8 ore/giorno', 'value': 'bassa'},
+]
+OPTIONS_IRRIGAZIONE = [
+    {'label': 'Goccia a goccia / Microirrigazione', 'value': 'goccia'},
+    {'label': 'Aspersione', 'value': 'aspersione'},
+    {'label': 'Manuale / Altro', 'value': 'manuale'},
+]
+OPTIONS_FERTILIZZAZIONE = [
+    {'label': 'Soluzione Nutritiva Controllata', 'value': 'idroponica'},
+    {'label': 'Fertirrigazione Bilanciata', 'value': 'fertirrigazione'},
+    {'label': 'Organica (Letame/Compost)', 'value': 'organica'},
+]
+OPTIONS_PATOGENI = [
+    {'label': 'Lotta Integrata', 'value': 'integrata'},
+    {'label': 'Biologico (Prodotti naturali)', 'value': 'biologico'},
+    {'label': 'Convenzionale (Prodotti di sintesi)', 'value': 'convenzionale'},
+]
+OPTIONS_RACCOLTA = [
+    {'label': 'Ogni 1-2 giorni', 'value': 'alta'},
+    {'label': 'Ogni 3-4 giorni', 'value': 'media'},
+    {'label': 'Settimanale o più', 'value': 'bassa'},
+]
+OPTIONS_IMPOLLINAZIONE = [
+    {'label': 'Con Bombi', 'value': 'bombi'},
+    {'label': 'Naturale (Insetti autoctoni)', 'value': 'naturale'},
+    {'label': 'Manuale / Assente', 'value': 'manuale'},
+]
+OPTIONS_DENSITA = [
+    {'label': '> 7 piante/m²', 'value': 'alta'},
+    {'label': '5-7 piante/m²', 'value': 'media'},
+    {'label': '< 5 piante/m²', 'value': 'bassa'},
+]
+OPTIONS_UMIDITA = [
+    {'label': '60-75%', 'value': 'ottimale'},
+    {'label': '> 75%', 'value': 'alta_rischiosa'},
+    {'label': '< 60%', 'value': 'bassa_stress'},
+]
 
 # --- Definizione del Layout Principale ---
 layout = dbc.Container([
@@ -53,23 +97,22 @@ layout = dbc.Container([
     dbc.Card(
         dbc.CardBody([
             dbc.Row([
-                create_dropdown("Temperatura", "dd-temperatura"),
-                create_dropdown("Irraggiamento solare", "dd-luce"),
-                create_dropdown("Umidità", "dd-umidita"),
+                create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale'),
+                create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media'),
+                create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia'),
             ], className="mb-3"),
             dbc.Row([
-                create_dropdown("Irrigazione", "dd-irrigazione"),
-                create_dropdown("Fertilizzazione", "dd-fertilizzazione"),
-                create_dropdown("Controllo Patogeni", "dd-patogeni"),
+                create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale'),
+                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione'),
+                create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata'),
             ], className="mb-3"),
             dbc.Row([
                 create_dropdown(
-                    "Impollinazione Controllata",
-                    "dd-impollinazione",
+                    "Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
                     info_button_id="btn-info-impollinazione"
                 ),
-                create_dropdown("Densità di Coltivazione", "dd-densita"),
-                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta"),
+                create_dropdown("Densità Coltivazione", "dd-densita", OPTIONS_DENSITA, 'media'),
+                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media'),
             ])
         ]),
         className="mb-4 dropdown-panel-card"
