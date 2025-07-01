@@ -3,10 +3,14 @@
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
 
 # Importiamo le risorse necessarie
 from app import app
-from data import get_calendario_colturale_fragola  # Importiamo la NUOVA funzione
+from data import get_calendario_colturale_fragola
 
 
 PRESETS = {
@@ -137,7 +141,6 @@ def toggle_impollinazione_info_modal(n_open, n_close, is_open):
     return is_open, no_update
 
 @app.callback(
-    # L'Output è una lista di tutti i valori dei 9 dropdown
     [
         Output('dd-temperatura', 'value'),
         Output('dd-luce', 'value'),
@@ -181,3 +184,120 @@ def update_dropdowns_from_preset(*button_clicks):
 
     # Se per qualche motivo l'ID non è nei preset, non fare nulla
     return [no_update] * 9
+
+
+# --- 1. Algoritmo di Simulazione ---
+PRODUZIONE_BASE_OTTIMALE = 10.0  # kg/m², potenziale massimo teorico
+
+# Dizionario dei pesi: associa ogni opzione a un range di moltiplicatori (min, max)
+PESI_FATTORI = {
+    'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),
+                       'critico': (0.2, 0.4)},
+    'dd-luce': {'alta': (0.95, 1.0), 'media': (0.8, 0.9), 'bassa': (0.5, 0.7)},
+    'dd-irrigazione': {'goccia': (0.98, 1.0), 'aspersione': (0.75, 0.85), 'manuale': (0.6, 0.7)},
+    'dd-fertilizzazione': {'idroponica': (1.0, 1.0), 'fertirrigazione': (0.85, 0.95), 'organica': (0.65, 0.8)},
+    'dd-patogeni': {'integrata': (0.9, 1.0), 'biologico': (0.75, 0.85), 'convenzionale': (0.8, 0.9)},
+    'dd-frequenza-raccolta': {'alta': (0.95, 1.0), 'media': (0.8, 0.9), 'bassa': (0.6, 0.75)},
+    'dd-impollinazione': {'bombi': (0.98, 1.0), 'naturale': (0.7, 0.85), 'manuale': (0.4, 0.6)},
+    'dd-densita': {'alta': (0.9, 1.0), 'media': (0.8, 0.9), 'bassa': (0.6, 0.7)},
+    'dd-umidita': {'ottimale': (0.95, 1.0), 'alta_rischiosa': (0.6, 0.8), 'bassa_stress': (0.7, 0.85)},
+}
+
+
+def simula_produzione_annua(fattori_selezionati):
+    """
+    Calcola la produzione annua simulata in kg/m² basandosi sui fattori selezionati.
+    """
+    produzione_corrente = PRODUZIONE_BASE_OTTIMALE
+
+    for fattore_id, valore_selezionato in fattori_selezionati.items():
+        # Trova il range di pesi per il valore selezionato di quel fattore
+        range_peso = PESI_FATTORI[fattore_id][valore_selezionato]
+        # Estrai un moltiplicatore casuale da quel range
+        moltiplicatore = np.random.uniform(range_peso[0], range_peso[1])
+        # Applica il moltiplicatore
+        produzione_corrente *= moltiplicatore
+
+    return produzione_corrente
+
+
+# --- 2. Callback Principale per il Grafico ---
+@app.callback(
+    Output('grafico-principale', 'figure'),
+    Output('testo-spiegazione', 'children'),
+    # L'Input è la Tab attiva + tutti i 9 dropdown
+    Input('tabs-viste-grafici', 'value'),
+    *[Input(id, 'value') for id in PESI_FATTORI.keys()]
+)
+def update_main_graph(active_tab, *valori_dropdown):
+    # Se la tab attiva non è 'Andamento Produttivo', non fare nulla per ora
+    if active_tab != 'tab-produttivo':
+        # Puoi restituire un grafico vuoto e un messaggio
+        fig_vuota = go.Figure()
+        fig_vuota.update_layout(
+            xaxis={"visible": False},
+            yaxis={"visible": False},
+            annotations=[
+                {"text": "Seleziona un'altra vista per l'analisi", "xref": "paper", "yref": "paper", "showarrow": False,
+                 "font": {"size": 20}}]
+        )
+        return fig_vuota, dcc.Markdown("Questa sezione mostra l'andamento produttivo. Seleziona le altre tab per diverse analisi.")
+
+    # 1. Raccogli i valori dei dropdown in un dizionario
+    fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
+
+    # 2. Esegui la simulazione
+    produzione_simulata = simula_produzione_annua(fattori)
+
+    # 3. Definisci i benchmark
+    benchmark = {
+        'Sfavorevole': 3.0,  # kg/m²
+        'Media': 5.5,  # kg/m²
+        'Ottimale': 8.5,  # kg/m²
+    }
+
+    # 4. Prepara i dati per il grafico
+    data_to_plot = {
+        'Scenario': ['Scenario Scelto', 'Produzione Media', 'Produzione Ottimale', 'Produzione Sfavorevole'],
+        'Produzione (kg/m²)': [produzione_simulata, benchmark['Media'], benchmark['Ottimale'], benchmark['Sfavorevole']]
+    }
+    df_plot = pd.DataFrame(data_to_plot)
+
+    # 5. Crea il grafico a barre
+    fig = px.bar(
+        df_plot,
+        x='Scenario',
+        y='Produzione (kg/m²)',
+        title='Confronto Produzione Annua Stimata (kg/m²)',
+        text_auto='.2f',  # Mostra il valore sopra ogni barra, con 2 decimali
+        color='Scenario',  # Colora ogni barra in modo diverso
+        color_discrete_map={
+            'Scenario Scelto': '#d13045',  # Il nostro colore rosso per evidenziare
+            'Produzione Media': '#7eb671',
+            'Produzione Ottimale': '#495b52',
+            'Produzione Sfavorevole': '#f0ad4e'
+        }
+    )
+    fig.update_layout(
+        xaxis_title=None,
+        yaxis_title='Produzione (kg/m²)',
+        showlegend=False,  # La legenda è ridondante con le etichette dell'asse x
+        plot_bgcolor='rgba(0,0,0,0)',  # Sfondo del plot trasparente
+        paper_bgcolor='rgba(0,0,0,0)',  # Sfondo generale trasparente
+        font=dict(color='#495b52')  # Colore del testo
+    )
+    fig.update_traces(textposition='outside')
+
+    # 6. Crea la spiegazione dinamica
+    spiegazione = f"""
+    Basandosi sui parametri di coltivazione selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
+
+    Questo valore si confronta con i seguenti benchmark standard per il settore:
+    - **Produzione Ottimale**: {benchmark['Ottimale']:.2f} kg/m² (tipica di impianti ad alta tecnologia).
+    - **Produzione Media**: {benchmark['Media']:.2f} kg/m² (risultato comune per aziende ben gestite).
+    - **Produzione Sfavorevole**: {benchmark['Sfavorevole']:.2f} kg/m² (in condizioni di stress o gestione non ideale).
+
+    *Nota: questa è una simulazione basata su un modello. I risultati reali possono variare.*
+    """
+
+    return fig, dcc.Markdown(spiegazione)
