@@ -12,24 +12,24 @@ from data import get_calendario_colturale_fragola  # Importiamo la NUOVA funzion
 PRESETS = {
     # Preset per tipo di coltura
     "btn-preset-tradizionale": {
-        'dd-temperatura': 'medium', 'dd-luce': 'medium', 'dd-umidita': 'medium',
-        'dd-irrigazione': 'medium', 'dd-fertilizzazione': 'low', 'dd-patogeni': 'medium',
-        'dd-impollinazione': 'low', 'dd-densita': 'medium', 'dd-frequenza-raccolta': 'medium'
+        'dd-temperatura': 'high', 'dd-luce': 'medium', 'dd-umidita': 'medium',
+        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'medium',
+        'dd-impollinazione': 'low', 'dd-densita': 'low', 'dd-frequenza-raccolta': 'medium'
     },
     "btn-preset-soilless": {
-        'dd-temperatura': 'high', 'dd-luce': 'high', 'dd-umidita': 'high',
-        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'low',
+        'dd-temperatura': 'medium', 'dd-luce': 'high', 'dd-umidita': 'medium',
+        'dd-irrigazione': 'medium', 'dd-fertilizzazione': 'medium', 'dd-patogeni': 'high',
         'dd-impollinazione': 'high', 'dd-densita': 'high', 'dd-frequenza-raccolta': 'high'
     },
     "btn-preset-idroponica": {
-        'dd-temperatura': 'high', 'dd-luce': 'high', 'dd-umidita': 'high',
-        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'low',
-        'dd-impollinazione': 'high', 'dd-densita': 'high',  'dd-frequenza-raccolta': 'high'
+        'dd-temperatura': 'medium', 'dd-luce': 'high', 'dd-umidita': 'medium',
+        'dd-irrigazione': 'low', 'dd-fertilizzazione': 'low', 'dd-patogeni': 'high',
+        'dd-impollinazione': 'medium', 'dd-densita': 'high',  'dd-frequenza-raccolta': 'high'
     },
     # Preset per condizioni
     "btn-preset-sfavorevoli": {
         'dd-temperatura': 'low', 'dd-luce': 'low', 'dd-umidita': 'low',
-        'dd-irrigazione': 'low', 'dd-fertilizzazione': 'low', 'dd-patogeni': 'high',
+        'dd-irrigazione': 'low', 'dd-fertilizzazione': 'low', 'dd-patogeni': 'low',
         'dd-impollinazione': 'low', 'dd-densita': 'low', 'dd-frequenza-raccolta': 'low'
     },
     "btn-preset-medie": {
@@ -39,7 +39,7 @@ PRESETS = {
     },
     "btn-preset-ottimali": {
         'dd-temperatura': 'high', 'dd-luce': 'high', 'dd-umidita': 'high',
-        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'low',
+        'dd-irrigazione': 'high', 'dd-fertilizzazione': 'high', 'dd-patogeni': 'high',
         'dd-impollinazione': 'high', 'dd-densita': 'high', 'dd-frequenza-raccolta': 'high'
     }
 }
