@@ -72,15 +72,15 @@ OPTIONS_IMPOLLINAZIONE = [
     {'label': 'Naturale (Insetti autoctoni)', 'value': 'naturale'},
     {'label': 'Manuale / Assente', 'value': 'manuale'},
 ]
-OPTIONS_DENSITA = [
-    {'label': '> 7 piante/m²', 'value': 'alta'},
-    {'label': '5-7 piante/m²', 'value': 'media'},
-    {'label': '< 5 piante/m²', 'value': 'bassa'},
-]
 OPTIONS_UMIDITA = [
     {'label': '60-75%', 'value': 'ottimale'},
     {'label': '> 75%', 'value': 'alta_rischiosa'},
     {'label': '< 60%', 'value': 'bassa_stress'},
+]
+OPTIONS_SISTEMA = [
+    {'label': 'In Suolo Tradizionale', 'value': 'suolo'},
+    {'label': 'Fuori Suolo (Drenaggio a perdere)', 'value': 'soilless_aperto'},
+    {'label': 'Idroponico (Ricircolo)', 'value': 'idroponico_ricircolo'},
 ]
 
 # --- Definizione del Layout Principale ---
@@ -111,7 +111,7 @@ layout = dbc.Container([
                     "Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
                     info_button_id="btn-info-impollinazione"
                 ),
-                create_dropdown("Densità Coltivazione", "dd-densita", OPTIONS_DENSITA, 'media'),
+                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo'),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media'),
             ])
         ]),

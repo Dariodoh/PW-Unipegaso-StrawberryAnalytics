@@ -10,16 +10,15 @@ BENCHMARK_OTTIMALI = {'acqua': 500.0, # l/m², consumo ottimale stagionale d'acq
                       'fertilizzanti': 0.07 } # kg/m², consumo ottimale stagionale di fertilizzanti
 
 PESI_FATTORI = {
-    'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),
-                       'critico': (0.2, 0.4)},
+    'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),'critico': (0.2, 0.4)},
     'dd-luce': {'alta': (0.95, 1.0), 'media': (0.8, 0.9), 'bassa': (0.5, 0.7)},
     'dd-irrigazione': {'goccia': (0.98, 1.0), 'aspersione': (0.75, 0.85), 'manuale': (0.6, 0.7)},
     'dd-fertilizzazione': {'idroponica': (1.0, 1.0), 'fertirrigazione': (0.85, 0.95), 'organica': (0.65, 0.8)},
     'dd-patogeni': {'integrata': (0.9, 1.0), 'biologico': (0.75, 0.85), 'convenzionale': (0.8, 0.9)},
     'dd-frequenza-raccolta': {'alta': (0.95, 1.0), 'media': (0.8, 0.9), 'bassa': (0.6, 0.75)},
     'dd-impollinazione': {'bombi': (0.98, 1.0), 'naturale': (0.7, 0.85), 'manuale': (0.4, 0.6)},
-    'dd-densita': {'alta': (0.9, 1.0), 'media': (0.8, 0.9), 'bassa': (0.6, 0.7)},
     'dd-umidita': {'ottimale': (0.95, 1.0), 'alta_rischiosa': (0.6, 0.8), 'bassa_stress': (0.7, 0.85)},
+    'dd-sistema-colturale': {'suolo_tradizionale': (0.9, 1.0),'soilless_aperto': (1.1, 1.2),'idroponico_ricircolo': (1.2, 1.35)}
 }
 
 IMPATTI_RISORSE = {
@@ -41,8 +40,8 @@ IMPATTI_RISORSE = {
     },
     'dd-irrigazione': {
         'goccia': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'aspersione': {'acqua': 1.5, 'fertilizzanti': 1.2},
-        'scorrimento': {'acqua': 2.2, 'fertilizzanti': 1.5},
+        'aspersione': {'acqua': 1.4, 'fertilizzanti': 1.2},
+        'scorrimento': {'acqua': 2.0, 'fertilizzanti': 1.5},
     },
     'dd-fertilizzazione': {
         'fertirrigazione': {'acqua': 1.0, 'fertilizzanti': 1.0},
@@ -64,10 +63,10 @@ IMPATTI_RISORSE = {
         'manuale': {'acqua': 1.0, 'fertilizzanti': 1.0},
         'naturale': {'acqua': 1.0, 'fertilizzanti': 1.0},
     },
-    'dd-densita': {
-        'ideale': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'alta': {'acqua': 1.2, 'fertilizzanti': 1.25},
-        'bassa': {'acqua': 0.85, 'fertilizzanti': 0.85},
+    'dd-sistema-colturale': {
+        'suolo': {'acqua': 1.5, 'fertilizzanti': 1.4}, # Meno efficiente
+        'soilless_aperto': {'acqua': 0.8, 'fertilizzanti': 0.7}, # Molto efficiente
+        'idroponico_ricircolo': {'acqua': 0.15, 'fertilizzanti': 0.4}, # Estremamente efficiente
     },
 }
 
