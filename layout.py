@@ -152,7 +152,6 @@ layout = dbc.Container([
 
     html.Hr(),
 
-
     dcc.Tabs(id="tabs-viste-grafici", value='tab-produttivo', children=[
         dcc.Tab(label='Andamento Produttivo', value='tab-produttivo'),
         dcc.Tab(label='Uso delle Risorse', value='tab-risorse'),
@@ -163,19 +162,22 @@ layout = dbc.Container([
             dbc.Row([
                 # Colonna sinistra per la spiegazione
                 dbc.Col([
-                    html.H4("Spiegazione del Grafico", id="titolo-spiegazione", className="text-white"),
-                    html.Hr(className="border-white"),
+                    html.H4("Spiegazione del Grafico", id="titolo-spiegazione"),
+                    html.Hr(),
                     dcc.Markdown(id="testo-spiegazione",
                                  children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
-                ], width=3, className="explanation-column"),  # Aggiungiamo una classe per il separatore
+                ], width=4, className="explanation-column"),  # Allarghiamo un po'
 
-                # Colonna destra per il grafico
+                # Colonna destra che contiene TUTTI i grafici, impilati
                 dbc.Col([
-                    dcc.Graph(id='grafico-principale', style={'height': '50vh'})
-                ], width=9)
+                    # I grafici coesistono qui, ma solo uno sarà visibile
+                    dcc.Graph(id='grafico-produttivo', style={'height': '50vh', 'display': 'block'}),
+                    dcc.Graph(id='grafico-risorse', style={'height': '50vh', 'display': 'none'}),
+                    dcc.Graph(id='grafico-finanziario', style={'height': '50vh', 'display': 'none'}),
+                ], width=8)
             ])
         ]),
-        className="main-content-card"
+        className="main-content-card mt-3"  # Usiamo la classe che avevamo creato
     ),
 
     # Modale per la tabella mensile (esistente)

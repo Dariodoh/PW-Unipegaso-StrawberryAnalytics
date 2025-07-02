@@ -5,9 +5,10 @@ import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
-from data import prepare_benchmark_dataframe, PESI_FATTORI
+from data import prepare_benchmark_dataframe, simula_consumo_risorse, PESI_FATTORI
 
 # Importiamo le risorse necessarie
 from app import app
@@ -126,44 +127,93 @@ def update_dropdowns_from_preset(*button_clicks):
 
 
 @app.callback(
-    Output('grafico-principale', 'figure'),
+    # Aggiorniamo le figure
+    Output('grafico-produttivo', 'figure'),
+    Output('grafico-risorse', 'figure'),
+    Output('grafico-finanziario', 'figure'),
+    # Aggiorniamo la visibilità (stile)
+    Output('grafico-produttivo', 'style'),
+    Output('grafico-risorse', 'style'),
+    Output('grafico-finanziario', 'style'),
+    # Aggiorniamo la spiegazione
     Output('testo-spiegazione', 'children'),
     Input('tabs-viste-grafici', 'value'),
     *[Input(id, 'value') for id in PESI_FATTORI.keys()]
 )
-def update_main_graph(active_tab, *valori_dropdown):
-    if active_tab != 'tab-produttivo':
-        fig_vuota = go.Figure()
-        fig_vuota.update_layout(xaxis={"visible": False}, yaxis={"visible": False}, annotations=[
-            {"text": "Seleziona la tab 'Andamento Produttivo'", "xref": "paper", "yref": "paper", "showarrow": False,
-             "font": {"size": 20, "color": "#495b52"}}], plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-        return fig_vuota, "Questa sezione mostra l'andamento produttivo."
-
-
-    # Step 1: Chiamare la funzione da data.py per ottenere i dati pronti
+def update_main_view(active_tab, *valori_dropdown):
     fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
-    df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
 
-    # Step 2: Usare i dati ricevuti per plottare il grafico
-    fig = px.bar(df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h', title='Confronto Produzione Annua Stimata (kg/m²)',
-                 text_auto='.2f', color='Scenario',
-                 color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
-                                     'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': '#f0ad4e'})
-    fig.update_layout(xaxis_title='Produzione (kg/m²)',yaxis_title=None,  showlegend=False,
-                      plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
-                      transition={'duration': 1000, 'easing': 'cubic-in-out'})
-    fig.update_traces(textposition='outside',hovertemplate='<b>%{y}</b><br>Produzione: %{x:.2f} kg/m²<extra></extra>')
+    # Stili di default: tutti nascosti
+    style_prod = {'display': 'none', 'height': '50vh'}
+    style_risorse = {'display': 'none', 'height': '50vh'}
+    style_fin = {'display': 'none', 'height': '50vh'}
 
-    # Step 3: Usare il valore ricevuto per creare la spiegazione
-    spiegazione = f"""
-    Basandosi sui parametri di coltivazione selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
+    if active_tab == 'tab-produttivo':
+        df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
+        fig = px.bar(
+            df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
+            title='Confronto Produzione Annua Stimata (kg/m²)', text_auto='.2f', color='Scenario',
+            color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
+                                'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': '#f0ad4e'}
+        )
+        fig.update_layout(xaxis_title='Produzione (kg/m²)', yaxis_title=None, showlegend=False,
+                          plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
+                          transition={'duration': 500, 'easing': 'cubic-in-out'},
+                          title_x=0.5,
+                          title_xanchor='center'
+                          )
+        fig.update_traces(textposition='outside',
+                          hovertemplate='<b>%{y}</b><br>Produzione: %{x:.2f} kg/m²<extra></extra>')
+        spiegazione = f"""
+        Basandosi sui parametri di coltivazione selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
+    
+        Questo valore si confronta con i seguenti benchmark standard per il settore:
+        - **Produzione Ottimale**: 8.50 kg/m² (tipica di impianti ad alta tecnologia).
+        - **Produzione Media**: 5.50 kg/m² (risultato comune per aziende ben gestite).
+        - **Produzione Sfavorevole**: 3.00 kg/m² (in condizioni di stress o gestione non ideale).
+    
+        *Nota: questa è una simulazione basata su un modello. I risultati reali possono variare.*
+        """
 
-    Questo valore si confronta con i seguenti benchmark standard per il settore:
-    - **Produzione Ottimale**: 8.50 kg/m² (tipica di impianti ad alta tecnologia).
-    - **Produzione Media**: 5.50 kg/m² (risultato comune per aziende ben gestite).
-    - **Produzione Sfavorevole**: 3.00 kg/m² (in condizioni di stress o gestione non ideale).
+        style_prod['display'] = 'block'  # Rendiamo visibile solo questo
+        return fig, no_update, no_update, style_prod, style_risorse, style_fin, spiegazione
 
-    *Nota: questa è una simulazione basata su un modello. I risultati reali possono variare.*
-    """
+        # --- TAB: USO DELLE RISORSE ---
+    elif active_tab == 'tab-risorse':
+        consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
+        fig = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
+                            subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
+        fig.add_trace(go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'],
+                                   gauge={'axis': {'range': [None, 1250]}, 'bar': {'color': "#d13045"},
+                                          'steps': [{'range': [0, 550], 'color': "#7eb671"},
+                                                    {'range': [550, 750], 'color': "gold"}],
+                                          'threshold': {'value': 500}}), row=1, col=1)
+        fig.add_trace(
+            go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], number={'valueformat': '.3f'},
+                         gauge={'axis': {'range': [None, 0.175]}, 'bar': {'color': "#d13045"},
+                                'steps': [{'range': [0, 0.077], 'color': "#7eb671"},
+                                          {'range': [0.077, 0.105], 'color': "gold"}], 'threshold': {'value': 0.07}}),
+            row=1, col=2)
+        fig.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
+                          paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
+                          transition={'duration': 500, 'easing': 'cubic-in-out'},
+                          title_x=0.5,
+                          title_xanchor='center'
+                          )
+        spiegazione = f"""
+            Questa vista analizza l'efficienza nell'uso delle risorse. I valori stimati sono confrontati con un benchmark ottimale (linea nera).
+            - **Consumo Acqua Stimato**: **{consumi_stimati['acqua']:.0f} l/m²** (Ottimale: {benchmark_ottimali['acqua']:.0f} l/m²).
+            - **Consumo Fertilizzanti**: **{consumi_stimati['fertilizzanti']:.3f} kg/m²** (Ottimale: {benchmark_ottimali['fertilizzanti']:.3f} kg/m²).
+            """
+        style_risorse['display'] = 'block'  # Rendiamo visibile solo questo
+        return no_update, fig, no_update, style_prod, style_risorse, style_fin, spiegazione
 
-    return fig, spiegazione
+    elif active_tab == 'tab-finanziaria':
+        fig = go.Figure()
+        fig.update_layout(annotations=[{"text": "Sezione in sviluppo...", "showarrow": False}])
+        spiegazione = "Questa sezione analizzerà la performance finanziaria."
+
+        style_fin['display'] = 'block'  # Rendiamo visibile solo questo
+        return no_update, no_update, fig, style_prod, style_risorse, style_fin, spiegazione
+
+    return no_update, no_update, no_update, style_prod, style_risorse, style_fin, "Seleziona una tab."
