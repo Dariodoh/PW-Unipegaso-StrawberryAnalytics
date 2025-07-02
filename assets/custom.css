@@ -117,3 +117,29 @@ h4 {
 .tab:not(.tab--selected):hover {
     border-top: 3px solid #aab8b1 !important;
 }
+
+.main-content-card {
+    /* 1. Applichiamo lo STESSO gradiente dello sfondo */
+    background-image: linear-gradient(to bottom, white, #7eb671 250%);
+
+    /* 2. Rimuoviamo il bordo standard della card */
+    border: none;
+
+    /* 3. Aggiungiamo un'ombra per farla "fluttuare" */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Stile per il Separatore Verticale --- */
+.explanation-column {
+    /* Crea una linea di separazione a destra della colonna */
+    border-right: 1px solid rgba(73, 91, 82, 1);
+
+    /* Aggiunge un po' di spazio tra il testo e la linea */
+    padding-right: 25px;
+}
+
+/* Assicuriamo che il testo del Markdown sia leggibile */
+.main-content-card .markdown-container p,
+.main-content-card .markdown-container li {
+    color: white !important;
+}

@@ -157,22 +157,26 @@ layout = dbc.Container([
         dcc.Tab(label='Andamento Produttivo', value='tab-produttivo'),
         dcc.Tab(label='Uso delle Risorse', value='tab-risorse'),
         dcc.Tab(label='Performance Finanziaria', value='tab-finanziaria'),
-    ], className="mb-3"),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card(dbc.CardBody([
-                html.H4("Spiegazione del Grafico", id="titolo-spiegazione"),
-                html.Hr(),
-                dcc.Markdown(id="testo-spiegazione",
-                             children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
-            ]))
-        ], width=3),
-        dbc.Col([
-            dbc.Card(dbc.CardBody([
-                dcc.Graph(id='grafico-principale', style={'height': '50vh'})
-            ]))
-        ], width=9)
     ]),
+    dbc.Card(
+        dbc.CardBody([
+            dbc.Row([
+                # Colonna sinistra per la spiegazione
+                dbc.Col([
+                    html.H4("Spiegazione del Grafico", id="titolo-spiegazione", className="text-white"),
+                    html.Hr(className="border-white"),
+                    dcc.Markdown(id="testo-spiegazione",
+                                 children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
+                ], width=3, className="explanation-column"),  # Aggiungiamo una classe per il separatore
+
+                # Colonna destra per il grafico
+                dbc.Col([
+                    dcc.Graph(id='grafico-principale', style={'height': '50vh'})
+                ], width=9)
+            ])
+        ]),
+        className="main-content-card"
+    ),
 
     # Modale per la tabella mensile (esistente)
     dbc.Modal([
