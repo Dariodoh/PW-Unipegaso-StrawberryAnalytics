@@ -19,49 +19,49 @@ PRESETS = {
         'dd-temperatura': 'sub-freddo',
         'dd-luce': 'media',
         'dd-umidita': 'alta_rischiosa',
-        'dd-irrigazione': 'scorrimento',
-        'dd-fertilizzazione': 'tradizionale',
+        'dd-irrigazione': 'manuale',
+        'dd-fertilizzazione': 'organica',
         'dd-patogeni': 'convenzionale',
-        'dd-impollinazione': 'naturale',
         'dd-frequenza-raccolta': 'bassa',
-        'dd-sistema-colturale': 'suolo'
+        'dd-impollinazione': 'naturale',
+        'dd-sistema-colturale': 'suolo_tradizionale'
     },
     "btn-preset-soilless": {
         'dd-temperatura': 'ottimale',
-        'dd-luce': 'ottimale',
+        'dd-luce': 'alta',
         'dd-umidita': 'ottimale',
         'dd-irrigazione': 'goccia',
         'dd-fertilizzazione': 'fertirrigazione',
-        'dd-patogeni': 'lotta_integrata',
-        'dd-impollinazione': 'bombi',
+        'dd-patogeni': 'integrata',
         'dd-frequenza-raccolta': 'media',
+        'dd-impollinazione': 'bombi',
         'dd-sistema-colturale': 'soilless_aperto'
     },
     "btn-preset-idroponica": {
         'dd-temperatura': 'ottimale',
-        'dd-luce': 'ottimale',
+        'dd-luce': 'alta',
         'dd-umidita': 'ottimale',
         'dd-irrigazione': 'goccia',
-        'dd-fertilizzazione': 'fertirrigazione',
-        'dd-patogeni': 'lotta_integrata',
-        'dd-impollinazione': 'bombi',
+        'dd-fertilizzazione': 'idroponica',
+        'dd-patogeni': 'integrata',
         'dd-frequenza-raccolta': 'alta',
+        'dd-impollinazione': 'bombi',
         'dd-sistema-colturale': 'idroponico_ricircolo'
     },
     "btn-preset-sfavorevoli": {
-        'dd-temperatura': 'critico', 'dd-luce': 'bassa', 'dd-irrigazione': 'manuale',
+        'dd-temperatura': 'critico', 'dd-luce': 'bassa', 'dd-umidita': 'alta_rischiosa', 'dd-irrigazione': 'manuale',
         'dd-fertilizzazione': 'organica', 'dd-patogeni': 'convenzionale', 'dd-frequenza-raccolta': 'bassa',
-        'dd-impollinazione': 'manuale', 'dd-umidita': 'alta_rischiosa', 'dd-sistema-colturale': 'suolo'
+        'dd-impollinazione': 'manuale', 'dd-sistema-colturale': 'suolo_tradizionale'
     },
     "btn-preset-medie": {
-        'dd-temperatura': 'sub-caldo', 'dd-luce': 'media', 'dd-irrigazione': 'goccia',
-        'dd-fertilizzazione': 'fertirrigazione', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'media',
-        'dd-impollinazione': 'naturale', 'dd-umidita': 'alta_rischiosa','dd-sistema-colturale': 'soilless_aperto'
+        'dd-temperatura': 'sub-caldo', 'dd-luce': 'media', 'dd-umidita': 'alta_rischiosa', 'dd-irrigazione': 'aspersione',
+        'dd-fertilizzazione': 'fertirrigazione', 'dd-patogeni': 'biologico', 'dd-frequenza-raccolta': 'media',
+        'dd-impollinazione': 'naturale', 'dd-sistema-colturale': 'soilless_aperto'
     },
     "btn-preset-ottimali": {
-        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-irrigazione': 'goccia',
-        'dd-fertilizzazione': 'fertirrigazione', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'alta',
-        'dd-impollinazione': 'bombi', 'dd-umidita': 'ottimale', 'dd-sistema-colturale': 'idroponico_ricircolo'
+        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-umidita': 'ottimale',  'dd-irrigazione': 'goccia',
+        'dd-fertilizzazione': 'idroponica', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'alta',
+        'dd-impollinazione': 'bombi', 'dd-sistema-colturale': 'idroponico_ricircolo'
     }
 }
 
@@ -123,10 +123,17 @@ def toggle_impollinazione_info_modal(n_open, n_close, is_open):
 
 
 @app.callback(
-    [Output("dd-temperatura", "value"), Output("dd-luce", "value"), Output("dd-umidita", "value"),
-     Output("dd-irrigazione", "value"), Output("dd-fertilizzazione", "value"), Output("dd-patogeni", "value"),
-     Output("dd-frequenza-raccolta", "value"), Output("dd-impollinazione", "value"),
-     Output("dd-sistema-colturale", "value")],
+    [
+        Output("dd-temperatura", "value"),
+        Output("dd-luce", "value"),
+        Output("dd-umidita", "value"),
+        Output("dd-irrigazione", "value"),
+        Output("dd-fertilizzazione", "value"),
+        Output("dd-patogeni", "value"),
+        Output("dd-frequenza-raccolta", "value"),  # 7° posto
+        Output("dd-impollinazione", "value"),  # 8° posto
+        Output("dd-sistema-colturale", "value")
+    ],
     Input('btn-preset-tradizionale', 'n_clicks'),
     Input('btn-preset-soilless', 'n_clicks'),
     Input('btn-preset-idroponica', 'n_clicks'),
@@ -138,7 +145,7 @@ def toggle_impollinazione_info_modal(n_open, n_close, is_open):
 def update_dropdowns_from_preset(*button_clicks):
     ctx = callback_context
     if not ctx.triggered_id: raise PreventUpdate
-    button_id = ctx.triggered_id
+    button_id = ctx.triggered_id.split(".")[0]
     if button_id in PRESETS:
         preset_values = PRESETS[button_id]
         return list(preset_values.values())

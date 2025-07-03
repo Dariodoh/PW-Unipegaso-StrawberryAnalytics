@@ -39,8 +39,8 @@ OPTIONS_TEMPERATURA = [
     {'label': '18-24°C', 'value': 'ottimale'},
     {'label': '12-17°C', 'value': 'sub-freddo'},
     {'label': '25-29°C', 'value': 'sub-caldo'},
-    {'label': '<12°C', 'value': 'critico-freddo'},
-    {'label': '>29°C', 'value': 'critico-caldo'},
+    {'label': '<12°C', 'value': 'critico'},
+    {'label': '>29°C', 'value': 'critico'},
 ]
 OPTIONS_LUCE = [
     {'label': '> 12 ore/giorno', 'value': 'alta'},
@@ -78,7 +78,7 @@ OPTIONS_UMIDITA = [
     {'label': '< 60%', 'value': 'bassa_stress'},
 ]
 OPTIONS_SISTEMA = [
-    {'label': 'In Suolo Tradizionale', 'value': 'suolo'},
+    {'label': 'In Suolo Tradizionale', 'value': 'suolo_tradizionale'},
     {'label': 'Fuori Suolo (Drenaggio a perdere)', 'value': 'soilless_aperto'},
     {'label': 'Idroponico (Ricircolo)', 'value': 'idroponico_ricircolo'},
 ]
@@ -111,7 +111,7 @@ layout = dbc.Container([
                     "Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
                     info_button_id="btn-info-impollinazione"
                 ),
-                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo'),
+                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale'),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media'),
             ])
         ]),

@@ -29,9 +29,9 @@ IMPATTI_RISORSE = {
         'critico': {'acqua': 1.4, 'fertilizzanti': 0.8},
     },
     'dd-luce': {
-        'ottimale': {'acqua': 1.0, 'fertilizzanti': 1.1},
+        'alta': {'acqua': 1.0, 'fertilizzanti': 1.1},
         'media': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'scarsa': {'acqua': 0.95, 'fertilizzanti': 0.9},
+        'bassa': {'acqua': 0.95, 'fertilizzanti': 0.9},
     },
     'dd-umidita': {
         'ottimale': {'acqua': 1.0, 'fertilizzanti': 1.0},
@@ -41,15 +41,15 @@ IMPATTI_RISORSE = {
     'dd-irrigazione': {
         'goccia': {'acqua': 1.0, 'fertilizzanti': 1.0},
         'aspersione': {'acqua': 1.4, 'fertilizzanti': 1.2},
-        'scorrimento': {'acqua': 2.0, 'fertilizzanti': 1.5},
+        'manuale': {'acqua': 2.0, 'fertilizzanti': 1.5},
     },
     'dd-fertilizzazione': {
-        'fertirrigazione': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'organica': {'acqua': 1.05, 'fertilizzanti': 1.15},
-        'tradizionale': {'acqua': 1.1, 'fertilizzanti': 1.3},
+        'idroponica': {'acqua': 1.0, 'fertilizzanti': 1.0},
+        'fertirrigazione': {'acqua': 1.05, 'fertilizzanti': 1.15},
+        'organica': {'acqua': 1.1, 'fertilizzanti': 1.3},
     },
     'dd-patogeni': {
-        'lotta_integrata': {'acqua': 1.0, 'fertilizzanti': 1.0},
+        'integrata': {'acqua': 1.0, 'fertilizzanti': 1.0},
         'biologica': {'acqua': 1.0, 'fertilizzanti': 1.0},
         'convenzionale': {'acqua': 1.0, 'fertilizzanti': 1.0},
     },
@@ -64,7 +64,7 @@ IMPATTI_RISORSE = {
         'naturale': {'acqua': 1.0, 'fertilizzanti': 1.0},
     },
     'dd-sistema-colturale': {
-        'suolo': {'acqua': 1.5, 'fertilizzanti': 1.4}, # Meno efficiente
+        'suolo_tradizionale': {'acqua': 1.5, 'fertilizzanti': 1.4}, # Meno efficiente
         'soilless_aperto': {'acqua': 0.8, 'fertilizzanti': 0.7}, # Molto efficiente
         'idroponico_ricircolo': {'acqua': 0.15, 'fertilizzanti': 0.4}, # Estremamente efficiente
     },
