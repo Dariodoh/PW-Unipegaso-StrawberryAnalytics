@@ -6,12 +6,12 @@ from app import app  # Importa l'istanza 'app' per usare le risorse (es. logo)
 
 
 # --- Funzione Helper per creare i dropdown in modo pulito ---
-def create_dropdown(title, control_id, options, default_value, info_button_id=None):
+def create_dropdown(title, control_id, options, default_value, width, info_button_id=None):
     """
     Crea un label (con un pulsante info opzionale) e un dropdown.
     """
     # Il titolo ora può contenere più elementi (label + bottone)
-    label_content = [html.Label(f"{title}:")]
+    label_content = [html.Label(f"{title}:", className="form-label")]
     if info_button_id:
         # Se viene fornito un ID, aggiungiamo un piccolo pulsante 'i'
         label_content.append(
@@ -31,8 +31,9 @@ def create_dropdown(title, control_id, options, default_value, info_button_id=No
                 clearable=False
             )
         ]),
-        width=4
+        width=width
     )
+
 
 # --- Definiamo qui le opzioni per i dropdown ---
 OPTIONS_TEMPERATURA = [
@@ -88,7 +89,7 @@ layout = dbc.Container([
     # ... (header, card e la prima riga di dropdown rimangono invariati) ...
     dbc.Row([
         dbc.Col(
-            html.Img(src=app.get_asset_url('logo.jpg'), height="300px"),
+            html.Img(src=app.get_asset_url('logo.jpg'), height="150px"),
             width=12,
             className="mb-4 mt-4 d-flex justify-content-center"
         )
@@ -97,23 +98,21 @@ layout = dbc.Container([
     dbc.Card(
         dbc.CardBody([
             dbc.Row([
-                create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale'),
-                create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media'),
-                create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia'),
-            ], className="mb-3"),
-            dbc.Row([
-                create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale'),
-                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione'),
-                create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata'),
-            ], className="mb-3"),
-            dbc.Row([
+                create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale', width="2"),
+                create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media', width="2"),
+                create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale', width="2"),
+                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione', width="2"),
+                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media', width="2"),
                 create_dropdown(
                     "Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
-                    info_button_id="btn-info-impollinazione"
+                    info_button_id="btn-info-impollinazione", width="2"
                 ),
-                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale'),
-                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media'),
-            ])
+            ], className="mb-3"),
+            dbc.Row([
+                create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia', width="4"),
+                create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata', width="4"),
+                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale', width="4")
+            ], className="mb-3"),
         ]),
         className="mb-4 dropdown-panel-card"
     ),
@@ -177,7 +176,7 @@ layout = dbc.Container([
                 ], width=8)
             ])
         ]),
-        className="main-content-card mt-3"  # Usiamo la classe che avevamo creato
+        className="main-content-card"
     ),
 
     # Modale per la tabella mensile (esistente)
