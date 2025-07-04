@@ -181,8 +181,8 @@ def update_main_view(active_tab, *valori_dropdown):
     dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati)
 
     # Stili di default per i contenitori: tutti nascosti
-    style_hidden = {'opacity': 0, 'pointer-events': 'none'}
-    style_visible = {'opacity': 1, 'pointer-events': 'auto'}
+    style_hidden = {'display': 'none'}
+    style_visible = {'display': 'block', 'width': '100%'}
 
     fig_produttivo = px.bar(
         df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
@@ -190,44 +190,54 @@ def update_main_view(active_tab, *valori_dropdown):
         color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
                             'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': '#f0ad4e'}
     )
-    fig_produttivo.update_layout(showlegend=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+    fig_produttivo.update_layout(xaxis_title='Produzione (kg/m²)', yaxis_title=None, showlegend=False,
+                                 plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
+                                 title_x=0.5, title_xanchor='center')
+    fig_produttivo.update_traces(textposition='outside',
+                                 hovertemplate='<b>%{y}</b><br>Produzione: %{x:.2f} kg/m²<extra></extra>')
 
     fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
                                 subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
-    fig_risorse.add_trace(
-        go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'], gauge={'axis': {'range': [None, 1250]}}),
-        row=1, col=1)
+    fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'],
+                                       gauge={'axis': {'range': [None, 1250]}, 'bar': {'color': "#d13045"},
+                                              'steps': [{'range': [0, 550], 'color': "#7eb671"},
+                                                        {'range': [550, 750], 'color': "gold"}],
+                                              'threshold': {'value': 500}}), row=1, col=1)
     fig_risorse.add_trace(
         go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], number={'valueformat': '.3f'},
-                     gauge={'axis': {'range': [None, 0.175]}}), row=1, col=2)
-    fig_risorse.update_layout(title_text="Stima del Consumo di Risorse", plot_bgcolor='rgba(0,0,0,0)',
-                              paper_bgcolor='rgba(0,0,0,0)')
+                     gauge={'axis': {'range': [None, 0.175]}, 'bar': {'color': "#d13045"},
+                            'steps': [{'range': [0, 0.077], 'color': "#7eb671"},
+                                      {'range': [0.077, 0.105], 'color': "gold"}], 'threshold': {'value': 0.07}}),
+        row=1, col=2)
+    fig_risorse.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
+                              paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
+                              title_xanchor='center')
 
     ricavi_val = dati_finanziari['Ricavi (€/m²)']
     profitto_val = dati_finanziari['Profitto Lordo (€/m²)']
     costi_totali_val = ricavi_val - profitto_val
 
-    fig_sankey = go.Figure(data=[go.Sankey(
-        node=dict(label=["Ricavi", "Costi Totali", "Profitto Lordo"], color=["#495b52", "#d13045", "#7eb671"]),
-        link=dict(source=[0, 0], target=[1, 2], value=[costi_totali_val, profitto_val]),
-        node_hovertemplate='<b>%{label}</b><br>Valore: €%{value:.2f}<extra></extra>'
-    )])
-    fig_sankey.update_layout(title_text="Flusso Finanziario (€/m²)", plot_bgcolor='rgba(0,0,0,0)',
-                             paper_bgcolor='rgba(0,0,0,0)')
+    fig_sankey = go.Figure(data=[go.Sankey(node=dict(pad=15, thickness=20, line=dict(color="black", width=0.5),
+                                                     label=["Ricavi", "Costi Totali", "Profitto Lordo"],
+                                                     color=["#495b52", "#d13045", "#7eb671"]),
+                                           link=dict(source=[0, 0], target=[1, 2],
+                                                     value=[costi_totali_val, profitto_val]),
+                                           node_hovertemplate='<b>%{label}</b><br>Valore: €%{value:.2f}<extra></extra>')])
+    fig_sankey.update_layout(title_text="Flusso Finanziario (€/m²)", font=dict(size=12, color='#495b52'),
+                             plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                             margin=dict(t=40, b=20, l=10, r=10))
 
     costi_labels = ['Costo Acqua', 'Costo Fertilizzanti', 'Altri Costi']
     costi_values = [abs(dati_finanziari[k]) for k in costi_labels]
     color_map = {'Costo Acqua': '#7eb671','Costo Fertilizzanti': '#f0ad4e','Altri Costi': '#495b52'}
     final_colors = [color_map[label] for label in costi_labels]
 
-    fig_ciambella = go.Figure(data=[go.Pie(
-        labels=costi_labels, values=costi_values, hole=0.4,
-        marker=dict(colors=final_colors),
-        hovertemplate='Costo: € %{value:.2f}<extra></extra>',
-        uid='pie-chart-costs-uid'  # Manteniamo l'UID per sicurezza
-    )])
-    fig_ciambella.update_layout(title="Composizione dei Costi Variabili", plot_bgcolor='rgba(0,0,0,0)',
-                                paper_bgcolor='rgba(0,0,0,0)')
+    fig_ciambella = go.Figure(data=[
+        go.Pie(labels=costi_labels, values=costi_values, hole=0.4, marker=dict(colors=final_colors),
+               textposition='inside', textinfo='percent+label', hovertemplate='Costo: € %{value:.2f}<extra></extra>')])
+    fig_ciambella.update_layout(title="Composizione dei Costi Variabili", showlegend=False,
+                                plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
+                                title_x=0.5, title_xanchor='center', margin=dict(t=40, b=20, l=10, r=10))
 
     if active_tab == 'tab-produttivo':
         spiegazione = f"""

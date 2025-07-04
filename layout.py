@@ -2,7 +2,7 @@
 
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from app import app  # Importa l'istanza 'app' per usare le risorse (es. logo)
+from app import app
 
 
 # --- Funzione Helper per creare i dropdown in modo pulito ---
@@ -86,13 +86,8 @@ OPTIONS_SISTEMA = [
 
 # --- Definizione del Layout Principale ---
 layout = dbc.Container([
-    # ... (header, card e la prima riga di dropdown rimangono invariati) ...
     dbc.Row([
-        dbc.Col(
-            html.Img(src=app.get_asset_url('logo.jpg'), height="150px"),
-            width=12,
-            className="mb-4 mt-4 d-flex justify-content-center"
-        )
+        dbc.Col(html.Img(src=app.get_asset_url('logo.jpg'), height="150px"),width=12,className="mb-4 mt-4 d-flex justify-content-center")
     ]),
 
     dbc.Card(
@@ -101,19 +96,15 @@ layout = dbc.Container([
                 create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale', width="2"),
                 create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media', width="2"),
                 create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale', width="2"),
-                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione',
-                                width="2"),
+                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione',width="2"),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media', width="2"),
-                create_dropdown(
-                    "Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
-                    info_button_id="btn-info-impollinazione", width="2"
-                ),
+                create_dropdown("Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
+                    info_button_id="btn-info-impollinazione", width="2"),
             ], className="mb-3"),
             dbc.Row([
                 create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia', width="4"),
                 create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata', width="4"),
-                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale',
-                                width="4")
+                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale',width="4")
             ], className="mb-3"),
         ]),
         className="mb-4 dropdown-panel-card"
@@ -142,14 +133,9 @@ layout = dbc.Container([
 
         # Colonna per il pulsante singolo
         dbc.Col([
-            dbc.Button("Distribuzione Mensile", id="btn-distribuzione-mensile", n_clicks=0,
-                       className="custom-button-green")
+            dbc.Button("Distribuzione Mensile", id="btn-distribuzione-mensile", n_clicks=0,className="custom-button-green")
         ], width=2)
-
-    ],
-        align="end",
-        className="mb-4"
-    ),
+    ],align="end",className="mb-4"),
 
     html.Hr(),
 
@@ -167,7 +153,7 @@ layout = dbc.Container([
                     html.Hr(),
                     dcc.Markdown(id="testo-spiegazione",
                                  children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
-                ], width=4, className="explanation-column"),  # Allarghiamo un po'
+                ], width=4, className="explanation-column"),
 
                 dbc.Col([
                     html.Div(
@@ -189,20 +175,9 @@ layout = dbc.Container([
                         style={'display': 'none', 'width': '100%'},
                         children=[
                             dbc.Row([
-                                dbc.Col([
-                                    dcc.Graph(id='grafico-sankey-finanziario', style={'height': '50vh'})
-                                ], width=6),
-                                dbc.Col(dcc.Graph(
-                                    id='grafico-composizione-costi',
-                                    animate=True,
-                                    animation_options={
-                                        'transition': {
-                                            'duration': 500,
-                                            'easing': 'cubic-in-out'
-                                        }
-                                    }
-                                ), width=6),
-                            ])
+                                dbc.Col(dcc.Graph(id='grafico-sankey-finanziario'), width=6),
+                                dbc.Col(dcc.Graph(id='grafico-composizione-costi'), width=6),
+                            ], style={'height': '50vh'})
                         ]
                     ),
                 ], width=8, className="p-3", id="graph-column-container")
@@ -211,20 +186,20 @@ layout = dbc.Container([
         className="main-content-card"
     ),
 
-    # Modale per la tabella mensile (esistente)
+    # Modale per la tabella mensile
     dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("Distribuzione Mensile della Produzione")),
         dbc.ModalBody(id="contenuto-tabella-mensile"),
         dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modale", className="ms-auto", n_clicks=0)),
     ], id="modale-tabella-mensile", size="xl", is_open=False),
 
-    # --- NUOVO MODALE PER L'INFO IMPOLLINAZIONE ---
+    # Modale per l'info impollinazione
     dbc.Modal([
         dbc.ModalHeader(dbc.ModalTitle("Info: Impollinazione Controllata con Bombi")),
-        dbc.ModalBody(id="contenuto-info-impollinazione"),  # Corpo con ID univoco
+        dbc.ModalBody(id="contenuto-info-impollinazione"),
         dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modal-impollinazione", n_clicks=0)),
     ],
-        id="modal-info-impollinazione",  # ID univoco per il modale
+        id="modal-info-impollinazione",
         size="xl",
         is_open=False,
     )
