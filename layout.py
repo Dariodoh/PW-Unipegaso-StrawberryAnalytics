@@ -101,7 +101,8 @@ layout = dbc.Container([
                 create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale', width="2"),
                 create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media', width="2"),
                 create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale', width="2"),
-                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione', width="2"),
+                create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione',
+                                width="2"),
                 create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media', width="2"),
                 create_dropdown(
                     "Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
@@ -111,7 +112,8 @@ layout = dbc.Container([
             dbc.Row([
                 create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia', width="4"),
                 create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata', width="4"),
-                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale', width="4")
+                create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale',
+                                width="4")
             ], className="mb-3"),
         ]),
         className="mb-4 dropdown-panel-card"
@@ -167,13 +169,43 @@ layout = dbc.Container([
                                  children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
                 ], width=4, className="explanation-column"),  # Allarghiamo un po'
 
-                # Colonna destra che contiene TUTTI i grafici, impilati
                 dbc.Col([
-                    # I grafici coesistono qui, ma solo uno sarà visibile
-                    dcc.Graph(id='grafico-produttivo', style={'height': '50vh', 'display': 'block'}),
-                    dcc.Graph(id='grafico-risorse', style={'height': '50vh', 'display': 'none'}),
-                    dcc.Graph(id='grafico-finanziario', style={'height': '50vh', 'display': 'none'}),
-                ], width=8)
+                    html.Div(
+                        id='container-produttivo',
+                        style={'display': 'block', 'width': '100%'},
+                        children=[
+                            dcc.Graph(id='grafico-produttivo', style={'height': '50vh'})
+                        ]
+                    ),
+                    html.Div(
+                        id='container-risorse',
+                        style={'display': 'none', 'width': '100%'},
+                        children=[
+                            dcc.Graph(id='grafico-risorse', style={'height': '50vh'})
+                        ]
+                    ),
+                    html.Div(
+                        id='container-finanziario',
+                        style={'display': 'none', 'width': '100%'},
+                        children=[
+                            dbc.Row([
+                                dbc.Col([
+                                    dcc.Graph(id='grafico-sankey-finanziario', style={'height': '50vh'})
+                                ], width=6),
+                                dbc.Col(dcc.Graph(
+                                    id='grafico-composizione-costi',
+                                    animate=True,
+                                    animation_options={
+                                        'transition': {
+                                            'duration': 500,
+                                            'easing': 'cubic-in-out'
+                                        }
+                                    }
+                                ), width=6),
+                            ])
+                        ]
+                    ),
+                ], width=8, className="p-3", id="graph-column-container")
             ])
         ]),
         className="main-content-card"
@@ -195,6 +227,5 @@ layout = dbc.Container([
         id="modal-info-impollinazione",  # ID univoco per il modale
         size="xl",
         is_open=False,
-    ),
-
+    )
 ], fluid=True)

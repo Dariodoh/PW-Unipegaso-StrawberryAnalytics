@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
-from data import prepare_benchmark_dataframe, simula_consumo_risorse, PESI_FATTORI
+from data import prepare_benchmark_dataframe, simula_consumo_risorse, simula_performance_finanziaria, PESI_FATTORI
 
 # Importiamo le risorse necessarie
 from app import app
@@ -54,12 +54,13 @@ PRESETS = {
         'dd-impollinazione': 'manuale', 'dd-sistema-colturale': 'suolo_tradizionale'
     },
     "btn-preset-medie": {
-        'dd-temperatura': 'sub-caldo', 'dd-luce': 'media', 'dd-umidita': 'alta_rischiosa', 'dd-irrigazione': 'aspersione',
+        'dd-temperatura': 'sub-caldo', 'dd-luce': 'media', 'dd-umidita': 'alta_rischiosa',
+        'dd-irrigazione': 'aspersione',
         'dd-fertilizzazione': 'fertirrigazione', 'dd-patogeni': 'biologico', 'dd-frequenza-raccolta': 'media',
         'dd-impollinazione': 'naturale', 'dd-sistema-colturale': 'soilless_aperto'
     },
     "btn-preset-ottimali": {
-        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-umidita': 'ottimale',  'dd-irrigazione': 'goccia',
+        'dd-temperatura': 'ottimale', 'dd-luce': 'alta', 'dd-umidita': 'ottimale', 'dd-irrigazione': 'goccia',
         'dd-fertilizzazione': 'idroponica', 'dd-patogeni': 'integrata', 'dd-frequenza-raccolta': 'alta',
         'dd-impollinazione': 'bombi', 'dd-sistema-colturale': 'idroponico_ricircolo'
     }
@@ -154,42 +155,81 @@ def update_dropdowns_from_preset(*button_clicks):
 
 @app.callback(
     # Aggiorniamo le figure
-    Output('grafico-produttivo', 'figure'),
-    Output('grafico-risorse', 'figure'),
-    Output('grafico-finanziario', 'figure'),
-    # Aggiorniamo la visibilità (stile)
-    Output('grafico-produttivo', 'style'),
-    Output('grafico-risorse', 'style'),
-    Output('grafico-finanziario', 'style'),
-    # Aggiorniamo la spiegazione
-    Output('testo-spiegazione', 'children'),
-    Input('tabs-viste-grafici', 'value'),
-    *[Input(id, 'value') for id in PESI_FATTORI.keys()]
+    [
+        Output('grafico-produttivo', 'figure'),
+        Output('grafico-risorse', 'figure'),
+        Output('grafico-sankey-finanziario', 'figure'),
+        Output('grafico-composizione-costi', 'figure'),
+
+        # Aggiorniamo la visibilità (stile)
+        Output('container-produttivo', 'style'),
+        Output('container-risorse', 'style'),
+        Output('container-finanziario', 'style'),
+        # Aggiorniamo la spiegazione
+        Output('testo-spiegazione', 'children')
+    ],
+    [
+        Input('tabs-viste-grafici', 'value'),
+        *[Input(id, 'value') for id in PESI_FATTORI.keys()]
+    ]
 )
 def update_main_view(active_tab, *valori_dropdown):
     fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
 
-    # Stili di default: tutti nascosti
-    style_prod = {'display': 'none', 'height': '50vh'}
-    style_risorse = {'display': 'none', 'height': '50vh'}
-    style_fin = {'display': 'none', 'height': '50vh'}
+    df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
+    consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
+    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati)
+
+    # Stili di default per i contenitori: tutti nascosti
+    style_hidden = {'opacity': 0, 'pointer-events': 'none'}
+    style_visible = {'opacity': 1, 'pointer-events': 'auto'}
+
+    fig_produttivo = px.bar(
+        df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
+        title='Confronto Produzione Annua Stimata (kg/m²)', text_auto='.2f', color='Scenario',
+        color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
+                            'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': '#f0ad4e'}
+    )
+    fig_produttivo.update_layout(showlegend=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+
+    fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
+                                subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
+    fig_risorse.add_trace(
+        go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'], gauge={'axis': {'range': [None, 1250]}}),
+        row=1, col=1)
+    fig_risorse.add_trace(
+        go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], number={'valueformat': '.3f'},
+                     gauge={'axis': {'range': [None, 0.175]}}), row=1, col=2)
+    fig_risorse.update_layout(title_text="Stima del Consumo di Risorse", plot_bgcolor='rgba(0,0,0,0)',
+                              paper_bgcolor='rgba(0,0,0,0)')
+
+    ricavi_val = dati_finanziari['Ricavi (€/m²)']
+    profitto_val = dati_finanziari['Profitto Lordo (€/m²)']
+    costi_totali_val = ricavi_val - profitto_val
+
+    fig_sankey = go.Figure(data=[go.Sankey(
+        node=dict(label=["Ricavi", "Costi Totali", "Profitto Lordo"], color=["#495b52", "#d13045", "#7eb671"]),
+        link=dict(source=[0, 0], target=[1, 2], value=[costi_totali_val, profitto_val]),
+        node_hovertemplate='<b>%{label}</b><br>Valore: €%{value:.2f}<extra></extra>'
+    )])
+    fig_sankey.update_layout(title_text="Flusso Finanziario (€/m²)", plot_bgcolor='rgba(0,0,0,0)',
+                             paper_bgcolor='rgba(0,0,0,0)')
+
+    costi_labels = ['Costo Acqua', 'Costo Fertilizzanti', 'Altri Costi']
+    costi_values = [abs(dati_finanziari[k]) for k in costi_labels]
+    color_map = {'Costo Acqua': '#7eb671','Costo Fertilizzanti': '#f0ad4e','Altri Costi': '#495b52'}
+    final_colors = [color_map[label] for label in costi_labels]
+
+    fig_ciambella = go.Figure(data=[go.Pie(
+        labels=costi_labels, values=costi_values, hole=0.4,
+        marker=dict(colors=final_colors),
+        hovertemplate='Costo: € %{value:.2f}<extra></extra>',
+        uid='pie-chart-costs-uid'  # Manteniamo l'UID per sicurezza
+    )])
+    fig_ciambella.update_layout(title="Composizione dei Costi Variabili", plot_bgcolor='rgba(0,0,0,0)',
+                                paper_bgcolor='rgba(0,0,0,0)')
 
     if active_tab == 'tab-produttivo':
-        df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
-        fig = px.bar(
-            df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
-            title='Confronto Produzione Annua Stimata (kg/m²)', text_auto='.2f', color='Scenario',
-            color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
-                                'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': '#f0ad4e'}
-        )
-        fig.update_layout(xaxis_title='Produzione (kg/m²)', yaxis_title=None, showlegend=False,
-                          plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
-                          transition={'duration': 500, 'easing': 'cubic-in-out'},
-                          title_x=0.5,
-                          title_xanchor='center'
-                          )
-        fig.update_traces(textposition='outside',
-                          hovertemplate='<b>%{y}</b><br>Produzione: %{x:.2f} kg/m²<extra></extra>')
         spiegazione = f"""
         Basandosi sui parametri di coltivazione selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
     
@@ -201,45 +241,34 @@ def update_main_view(active_tab, *valori_dropdown):
         *Nota: questa è una simulazione basata su un modello. I risultati reali possono variare.*
         """
 
-        style_prod['display'] = 'block'  # Rendiamo visibile solo questo
-        return fig, no_update, no_update, style_prod, style_risorse, style_fin, spiegazione
+        return (fig_produttivo, fig_risorse, fig_sankey, fig_ciambella,
+                style_visible, style_hidden, style_hidden, spiegazione)
 
         # --- TAB: USO DELLE RISORSE ---
     elif active_tab == 'tab-risorse':
-        consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
-        fig = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
-                            subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
-        fig.add_trace(go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'],
-                                   gauge={'axis': {'range': [None, 1250]}, 'bar': {'color': "#d13045"},
-                                          'steps': [{'range': [0, 550], 'color': "#7eb671"},
-                                                    {'range': [550, 750], 'color': "gold"}],
-                                          'threshold': {'value': 500}}), row=1, col=1)
-        fig.add_trace(
-            go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], number={'valueformat': '.3f'},
-                         gauge={'axis': {'range': [None, 0.175]}, 'bar': {'color': "#d13045"},
-                                'steps': [{'range': [0, 0.077], 'color': "#7eb671"},
-                                          {'range': [0.077, 0.105], 'color': "gold"}], 'threshold': {'value': 0.07}}),
-            row=1, col=2)
-        fig.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
-                          paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
-                          transition={'duration': 500, 'easing': 'cubic-in-out'},
-                          title_x=0.5,
-                          title_xanchor='center'
-                          )
         spiegazione = f"""
             Questa vista analizza l'efficienza nell'uso delle risorse. I valori stimati sono confrontati con un benchmark ottimale (linea nera).
             - **Consumo Acqua Stimato**: **{consumi_stimati['acqua']:.0f} l/m²** (Ottimale: {benchmark_ottimali['acqua']:.0f} l/m²).
             - **Consumo Fertilizzanti**: **{consumi_stimati['fertilizzanti']:.3f} kg/m²** (Ottimale: {benchmark_ottimali['fertilizzanti']:.3f} kg/m²).
             """
-        style_risorse['display'] = 'block'  # Rendiamo visibile solo questo
-        return no_update, fig, no_update, style_prod, style_risorse, style_fin, spiegazione
+
+        return (fig_produttivo, fig_risorse, fig_sankey, fig_ciambella,
+                style_hidden, style_visible, style_hidden, spiegazione)
 
     elif active_tab == 'tab-finanziaria':
-        fig = go.Figure()
-        fig.update_layout(annotations=[{"text": "Sezione in sviluppo...", "showarrow": False}])
-        spiegazione = "Questa sezione analizzerà la performance finanziaria."
+        spiegazione = f"""
+                Questa vista offre un'analisi finanziaria dettagliata per metro quadro (€/m²).
 
-        style_fin['display'] = 'block'  # Rendiamo visibile solo questo
-        return no_update, no_update, fig, style_prod, style_risorse, style_fin, spiegazione
+                **A sinistra**, il **diagramma di Sankey** mostra il flusso economico complessivo:
+                - I **Ricavi** si suddividono in **Costi Totali** e nel **Profitto Lordo** finale.
 
-    return no_update, no_update, no_update, style_prod, style_risorse, style_fin, "Seleziona una tab."
+                **A destra**, il **grafico a ciambella** analizza la composizione dei costi variabili, mostrando il peso percentuale di ogni voce.
+
+                - **Ricavi Stimati**: **{ricavi_val:.2f} €/m²**
+                - **Profitto Lordo Stimato**: **{profitto_val:.2f} €/m²**
+                """
+        return (fig_produttivo, fig_risorse, fig_sankey, fig_ciambella,
+                style_hidden, style_hidden, style_visible, spiegazione)
+
+        # Fallback
+    return ([no_update] * 8)
