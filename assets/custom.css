@@ -143,18 +143,3 @@ h4 {
 .main-content-card .markdown-container li {
     color: white !important;
 }
-
-#graph-column-container {
-    position: relative;
-    min-height: 50vh;
-}
-
-#container-produttivo,
-#container-risorse,
-#container-finanziario {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}

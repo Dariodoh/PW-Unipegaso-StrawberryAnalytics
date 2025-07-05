@@ -66,7 +66,6 @@ PRESETS = {
     }
 }
 
-
 @app.callback(
     Output("modale-tabella-mensile", "is_open"),
     Output("contenuto-tabella-mensile", "children"),
@@ -161,34 +160,84 @@ def update_dropdowns_from_preset(*button_clicks):
         Output('grafico-sankey-finanziario', 'figure'),
         Output('grafico-composizione-costi', 'figure'),
 
-        # Aggiorniamo la visibilità (stile)
         Output('container-produttivo', 'style'),
         Output('container-risorse', 'style'),
         Output('container-finanziario', 'style'),
-        # Aggiorniamo la spiegazione
         Output('testo-spiegazione', 'children')
     ],
     [
         Input('tabs-viste-grafici', 'value'),
-        *[Input(id, 'value') for id in PESI_FATTORI.keys()]
+        *[Input(id, 'value') for id in PESI_FATTORI.keys()],
+        Input('input-costo-acqua', 'value'),
+        Input('input-costo-fertilizzanti', 'value'),
+        Input('input-costi-extra', 'value')
+        # Input('dd-temperatura', 'value'),
+        # Input('dd-luce', 'value'),
+        # Input('dd-umidita', 'value'),
+        # Input('dd-fertilizzazione', 'value'),
+        # Input('dd-frequenza-raccolta', 'value'),
+        # Input('dd-impollinazione', 'value'),
+        # Input('dd-irrigazione', 'value'),
+        # Input('dd-patogeni', 'value'),
+        # Input('dd-sistema-colturale', 'value'),
+        # State('input-costo-acqua', 'value'),
+        # State('input-costo-fertilizzanti', 'value'),
+        # State('input-costi-extra', 'value')
     ]
 )
-def update_main_view(active_tab, *valori_dropdown):
-    fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
-
-    df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
-    consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
-    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati)
+def update_main_view(active_tab, *args):
+                     # val_temperatura, val_luce, val_umidita, val_fertilizzazione,
+                     # val_raccolta, val_impollinazione, val_irrigazione,
+                     # val_patogeni, val_sistema, costo_acqua, costo_fert, costi_extra):
 
     # Stili di default per i contenitori: tutti nascosti
     style_hidden = {'display': 'none'}
     style_visible = {'display': 'block', 'width': '100%'}
 
+    # fattori = {
+    #     'dd-temperatura': val_temperatura,
+    #     'dd-luce': val_luce,
+    #     'dd-umidita': val_umidita,
+    #     'dd-fertilizzazione': val_fertilizzazione,
+    #     'dd-frequenza-raccolta': val_raccolta,
+    #     'dd-impollinazione': val_impollinazione,
+    #     'dd-irrigazione': val_irrigazione,
+    #     'dd-patogeni': val_patogeni,
+    #     'dd-sistema-colturale': val_sistema
+    # }
+    #
+    # if not all(fattori.values()):
+    #     return [no_update] * 8
+
+    valori_dropdown = args[:9]
+    costo_acqua, costo_fert, costi_extra = args[9:]
+
+    fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
+
+    df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
+    consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
+
+    # Gestione robusta degli input economici, con fallback a 0 se non validi
+    try:
+        costo_acqua_val = float(costo_acqua)
+    except (ValueError, TypeError):
+        costo_acqua_val = 0
+    try:
+        costo_fert_val = float(costo_fert)
+    except (ValueError, TypeError):
+        costo_fert_val = 0
+    try:
+        costi_extra_val = float(costi_extra)
+    except (ValueError, TypeError):
+        costi_extra_val = 0
+
+    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, costo_acqua_val, costo_fert_val, costi_extra_val)
+
     fig_produttivo = px.bar(
         df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
         title='Confronto Produzione Annua Stimata (kg/m²)', text_auto='.2f', color='Scenario',
         color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
-                            'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': '#f0ad4e'}
+                            'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': 'gold'}
     )
     fig_produttivo.update_layout(xaxis_title='Produzione (kg/m²)', yaxis_title=None, showlegend=False,
                                  plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
@@ -199,15 +248,17 @@ def update_main_view(active_tab, *valori_dropdown):
     fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
                                 subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
     fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'],
-                                       gauge={'axis': {'range': [None, 1250]}, 'bar': {'color': "#d13045"},
+                                       gauge={'axis': {'range': [None, 1250]}, 'bar': {'color': "#495b52"},
                                               'steps': [{'range': [0, 550], 'color': "#7eb671"},
-                                                        {'range': [550, 750], 'color': "gold"}],
+                                                        {'range': [550, 750], 'color': "gold"},
+                                                        {'range': [750, 1250], 'color': "#d13045"}],
                                               'threshold': {'value': 500}}), row=1, col=1)
     fig_risorse.add_trace(
         go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], number={'valueformat': '.3f'},
-                     gauge={'axis': {'range': [None, 0.175]}, 'bar': {'color': "#d13045"},
+                     gauge={'axis': {'range': [None, 0.175]}, 'bar': {'color': "#495b52"},
                             'steps': [{'range': [0, 0.077], 'color': "#7eb671"},
-                                      {'range': [0.077, 0.105], 'color': "gold"}], 'threshold': {'value': 0.07}}),
+                                      {'range': [0.077, 0.105], 'color': "gold"},
+                                      {'range': [0.105, 0.175], 'color': "#d13045"}], 'threshold': {'value': 0.07}}),
         row=1, col=2)
     fig_risorse.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
                               paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
@@ -229,7 +280,7 @@ def update_main_view(active_tab, *valori_dropdown):
 
     costi_labels = ['Costo Acqua', 'Costo Fertilizzanti', 'Altri Costi']
     costi_values = [abs(dati_finanziari[k]) for k in costi_labels]
-    color_map = {'Costo Acqua': '#7eb671','Costo Fertilizzanti': '#f0ad4e','Altri Costi': '#495b52'}
+    color_map = {'Costo Acqua': '#63cec7','Costo Fertilizzanti': '#7eb671','Altri Costi': '#495b52'}
     final_colors = [color_map[label] for label in costi_labels]
 
     fig_ciambella = go.Figure(data=[

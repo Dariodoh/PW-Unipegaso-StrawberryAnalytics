@@ -9,9 +9,6 @@ CONSUMO_OTTIMALE_FERT = 0.07 # kg/m², consumo otimale stagionale di fertilizzan
 BENCHMARK_OTTIMALI = {'acqua': 500.0, # l/m², consumo ottimale stagionale d'acqua
                       'fertilizzanti': 0.07 } # kg/m², consumo ottimale stagionale di fertilizzanti
 PREZZO_VENDITA_FRAGOLE_AL_KG = 3.50      # Prezzo medio di vendita in €/kg
-COSTO_ACQUA_AL_METRO_CUBO = 1.00         # Costo dell'acqua in €/m³ (1 m³ = 1000 litri)
-COSTO_FERTILIZZANTI_AL_KG = 2.50         # Costo dei fertilizzanti in €/kg
-COSTI_VARIABILI_EXTRA_PER_ETTARO = 5000  # Stima di altri costi (manodopera, etc.) in €/Ha
 
 PESI_FATTORI = {
     'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),'critico': (0.2, 0.4)},
@@ -113,7 +110,7 @@ def simula_consumo_risorse(fattori: dict) -> tuple[dict, dict]:
     return consumi_stimati, BENCHMARK_OTTIMALI
 
 
-def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq):
+def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq, costo_acqua_m3, costo_fert_kg, costi_extra_ha):
     """
     Simula la performance finanziaria per metro quadro (m²).
 
@@ -130,11 +127,11 @@ def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq):
 
     # 2. Calcolo Costi per m²
     # Converti consumo acqua da litri a metri cubi (1000L = 1m³)
-    costo_acqua_mq = (consumi_risorse_mq['acqua'] / 1000) * COSTO_ACQUA_AL_METRO_CUBO
-    costo_fertilizzanti_mq = consumi_risorse_mq['fertilizzanti'] * COSTO_FERTILIZZANTI_AL_KG
+    costo_acqua_mq = (consumi_risorse_mq['acqua'] / 1000) * costo_acqua_m3
+    costo_fertilizzanti_mq = consumi_risorse_mq['fertilizzanti'] * costo_fert_kg
 
     # Converti costi extra da €/Ha a €/m² (1 Ha = 10.000 m²)
-    altri_costi_mq = COSTI_VARIABILI_EXTRA_PER_ETTARO / 10000
+    altri_costi_mq = costi_extra_ha / 10000
 
     costi_totali_mq = costo_acqua_mq + costo_fertilizzanti_mq + altri_costi_mq
 
@@ -144,9 +141,9 @@ def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq):
     # Restituisce un dizionario pronto per il grafico a cascata
     return {
         "Ricavi (€/m²)": ricavi_mq,
-        "Costo Acqua": costo_acqua_mq,
-        "Costo Fertilizzanti": costo_fertilizzanti_mq,
-        "Altri Costi": altri_costi_mq,
+        "Costo Acqua": -costo_acqua_mq,
+        "Costo Fertilizzanti": -costo_fertilizzanti_mq,
+        "Altri Costi": -altri_costi_mq,
         "Profitto Lordo (€/m²)": profitto_lordo_mq
     }
 
