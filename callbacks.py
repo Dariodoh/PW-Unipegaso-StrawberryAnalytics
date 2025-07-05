@@ -171,43 +171,13 @@ def update_dropdowns_from_preset(*button_clicks):
         Input('input-costo-acqua', 'value'),
         Input('input-costo-fertilizzanti', 'value'),
         Input('input-costi-extra', 'value')
-        # Input('dd-temperatura', 'value'),
-        # Input('dd-luce', 'value'),
-        # Input('dd-umidita', 'value'),
-        # Input('dd-fertilizzazione', 'value'),
-        # Input('dd-frequenza-raccolta', 'value'),
-        # Input('dd-impollinazione', 'value'),
-        # Input('dd-irrigazione', 'value'),
-        # Input('dd-patogeni', 'value'),
-        # Input('dd-sistema-colturale', 'value'),
-        # State('input-costo-acqua', 'value'),
-        # State('input-costo-fertilizzanti', 'value'),
-        # State('input-costi-extra', 'value')
     ]
 )
 def update_main_view(active_tab, *args):
-                     # val_temperatura, val_luce, val_umidita, val_fertilizzazione,
-                     # val_raccolta, val_impollinazione, val_irrigazione,
-                     # val_patogeni, val_sistema, costo_acqua, costo_fert, costi_extra):
 
     # Stili di default per i contenitori: tutti nascosti
     style_hidden = {'display': 'none'}
     style_visible = {'display': 'block', 'width': '100%'}
-
-    # fattori = {
-    #     'dd-temperatura': val_temperatura,
-    #     'dd-luce': val_luce,
-    #     'dd-umidita': val_umidita,
-    #     'dd-fertilizzazione': val_fertilizzazione,
-    #     'dd-frequenza-raccolta': val_raccolta,
-    #     'dd-impollinazione': val_impollinazione,
-    #     'dd-irrigazione': val_irrigazione,
-    #     'dd-patogeni': val_patogeni,
-    #     'dd-sistema-colturale': val_sistema
-    # }
-    #
-    # if not all(fattori.values()):
-    #     return [no_update] * 8
 
     valori_dropdown = args[:9]
     costo_acqua, costo_fert, costi_extra = args[9:]

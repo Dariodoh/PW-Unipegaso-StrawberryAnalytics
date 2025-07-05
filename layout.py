@@ -141,28 +141,6 @@ layout = dbc.Container([
         ], width=2)
     ], align="end", className="mb-4"),
 
-    # dbc.Card(
-    #     dbc.CardBody([
-    #         html.H5("Parametri Economici", className="card-title"),
-    #         dbc.Row([
-    #             dbc.Col([
-    #                 html.Label("Costo Acqua (€/m³)", className="form-label"),
-    #                 dcc.Input(id='input-costo-acqua', type='number', value=1.00, step=0.01, className="form-control")
-    #             ], width=4),
-    #             dbc.Col([
-    #                 html.Label("Costo Fertilizzanti (€/kg)", className="form-label"),
-    #                 dcc.Input(id='input-costo-fertilizzanti', type='number', value=2.50, step=0.01,
-    #                           className="form-control")
-    #             ], width=4),
-    #             dbc.Col([
-    #                 html.Label("Altri Costi Variabili (€/Ha)", className="form-label"),
-    #                 dcc.Input(id='input-costi-extra', type='number', value=5000, step=100, className="form-control")
-    #             ], width=4),
-    #         ]),
-    #     ]),
-    #     className="mb-4"
-    # ),
-
     html.Hr(),
 
     dcc.Tabs(id="tabs-viste-grafici", value='tab-produttivo', children=[
