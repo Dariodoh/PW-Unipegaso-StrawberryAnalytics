@@ -167,12 +167,12 @@ def prepare_benchmark_dataframe(fattori: dict) -> tuple[pd.DataFrame, float]:
 
     # 3. Prepara i dati per il DataFrame
     data_to_plot = {
-        'Scenario': ['Produzione Stimata', 'Produzione Media', 'Produzione Ottimale', 'Produzione Sfavorevole'],
+        'Scenario': ['Produzione Stimata', 'Produzione Sfavorevole', 'Produzione Media', 'Produzione Ottimale'],
         'Produzione (kg/m²)': [
             produzione_simulata,
+            benchmark['Sfavorevole'],
             benchmark['Media'],
-            benchmark['Ottimale'],
-            benchmark['Sfavorevole']
+            benchmark['Ottimale']
         ]
     }
 

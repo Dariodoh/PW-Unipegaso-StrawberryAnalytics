@@ -206,8 +206,8 @@ def update_main_view(active_tab, *args):
     fig_produttivo = px.bar(
         df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
         title='Confronto Produzione Annua Stimata (kg/m²)', text_auto='.2f', color='Scenario',
-        color_discrete_map={'Produzione Stimata': '#d13045', 'Produzione Media': '#7eb671',
-                            'Produzione Ottimale': '#495b52', 'Produzione Sfavorevole': 'gold'}
+        color_discrete_map={'Produzione Stimata': '#495b52', 'Produzione Sfavorevole': '#d13045',
+                            'Produzione Media': 'gold', 'Produzione Ottimale': '#7eb671'}
     )
     fig_produttivo.update_layout(xaxis_title='Produzione (kg/m²)', yaxis_title=None, showlegend=False,
                                  plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
@@ -250,7 +250,7 @@ def update_main_view(active_tab, *args):
 
     costi_labels = ['Costo Acqua', 'Costo Fertilizzanti', 'Altri Costi']
     costi_values = [abs(dati_finanziari[k]) for k in costi_labels]
-    color_map = {'Costo Acqua': '#63cec7','Costo Fertilizzanti': '#7eb671','Altri Costi': '#495b52'}
+    color_map = {'Costo Acqua': '#63cec7','Costo Fertilizzanti': '#7eb671','Altri Costi': 'gold'}
     final_colors = [color_map[label] for label in costi_labels]
 
     fig_ciambella = go.Figure(data=[
