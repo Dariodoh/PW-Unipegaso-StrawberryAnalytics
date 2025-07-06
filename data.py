@@ -4,10 +4,8 @@ import pandas as pd
 import numpy as np
 
 PRODUZIONE_BASE_OTTIMALE = 10.0  # kg/m², potenziale massimo teorico stagionale
-CONSUMO_OTTIMALE_ACQUA = 500.0 # l/m², consumo ottimale stagionale d'acqua
-CONSUMO_OTTIMALE_FERT = 0.07 # kg/m², consumo otimale stagionale di fertilizzanti
-BENCHMARK_OTTIMALI = {'acqua': 500.0, # l/m², consumo ottimale stagionale d'acqua
-                      'fertilizzanti': 0.07 } # kg/m², consumo ottimale stagionale di fertilizzanti
+BENCHMARK_OTTIMALI = {'acqua': 375.0, # l/m², consumo ottimale stagionale d'acqua
+                      'fertilizzanti': 0.0125 } # kg/m², consumo ottimale stagionale di fertilizzanti
 
 PESI_FATTORI = {
     'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),'critico': (0.2, 0.4)},

@@ -255,17 +255,19 @@ def update_main_view(active_tab, *args):
         fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
                                     subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
         fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'], uid='gauge-acqua-uid',
-                                           gauge={'axis': {'range': [None, 1250]}, 'bar': {'color': "#495b52"},
-                                                  'steps': [{'range': [0, 550], 'color': "#7eb671"},
-                                                            {'range': [550, 750], 'color': "gold"},
-                                                            {'range': [750, 1250], 'color': "#d13045"}],
-                                                  'threshold': {'value': 500}}), row=1, col=1)
+                                           gauge={'axis': {'range': [None, 1000]}, 'bar': {'color': "#495b52"},
+                                                  'steps': [{'range': [0, 300], 'color': "#d13045"},
+                                                            {'range': [300, 450], 'color': "#7eb671"},
+                                                            {'range': [450, 650], 'color': "gold"},
+                                                            {'range': [650, 1000], 'color': "#d13045"}],
+                                                  'threshold': {'value': 375}}), row=1, col=1)
         fig_risorse.add_trace(
             go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], uid='gauge-fert-uid', number={'valueformat': '.3f'},
-                         gauge={'axis': {'range': [None, 0.175]}, 'bar': {'color': "#495b52"},
-                                'steps': [{'range': [0, 0.077], 'color': "#7eb671"},
-                                          {'range': [0.077, 0.105], 'color': "gold"},
-                                          {'range': [0.105, 0.175], 'color': "#d13045"}], 'threshold': {'value': 0.07}}),
+                         gauge={'axis': {'range': [None, 0.030]}, 'bar': {'color': "#495b52"},
+                                'steps': [{'range': [0, 0.010], 'color': "#d13045"},
+                                          {'range': [0.010, 0.015], 'color': "#7eb671"},
+                                          {'range': [0.015, 0.020], 'color': "gold"},
+                                          {'range': [0.020, 0.030], 'color': "#d13045"}], 'threshold': {'value': 0.07}}),
             row=1, col=2)
         fig_risorse.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
                                   paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
