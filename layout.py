@@ -164,14 +164,14 @@ layout = dbc.Container([
                         id='container-produttivo',
                         style={'display': 'block', 'width': '100%'},
                         children=[
-                            dcc.Graph(id='grafico-produttivo', style={'height': '50vh'})
+                            dcc.Graph(id='grafico-produttivo', style={'height': '50vh'}, animate=True)
                         ]
                     ),
                     html.Div(
                         id='container-risorse',
                         style={'display': 'none', 'width': '100%'},
                         children=[
-                            dcc.Graph(id='grafico-risorse', style={'height': '50vh'})
+                            dcc.Graph(id='grafico-risorse', style={'height': '50vh'}, animate=True)
                         ]
                     ),
                     html.Div(
@@ -203,8 +203,12 @@ layout = dbc.Container([
                                 className="mb-4",
                             ),
                             dbc.Row([
-                                dbc.Col(dcc.Graph(id='grafico-sankey-finanziario'), width=6),
-                                dbc.Col(dcc.Graph(id='grafico-composizione-costi'), width=6)
+                                dbc.Col(dcc.Graph(id='grafico-sankey-finanziario',
+                                                  # animate=True
+                                                  ), width=6),
+                                dbc.Col(dcc.Graph(id='grafico-composizione-costi',
+                                                  # animate=True
+                                                  ), width=6)
                             ], style={'height': '50vh'})
                         ]
                     ),
