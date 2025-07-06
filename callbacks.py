@@ -168,6 +168,7 @@ def update_dropdowns_from_preset(*button_clicks):
     [
         Input('tabs-viste-grafici', 'value'),
         *[Input(id, 'value') for id in PESI_FATTORI.keys()],
+        Input('input-prezzo-vendita', 'value'),
         Input('input-costo-acqua', 'value'),
         Input('input-costo-fertilizzanti', 'value'),
         Input('input-costi-extra', 'value')
@@ -180,7 +181,7 @@ def update_main_view(active_tab, *args):
     style_visible = {'display': 'block', 'width': '100%'}
 
     valori_dropdown = args[:9]
-    costo_acqua, costo_fert, costi_extra = args[9:]
+    prezzo_vendita, costo_acqua, costo_fert, costi_extra = args[9:]
 
     fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
 
@@ -188,6 +189,10 @@ def update_main_view(active_tab, *args):
     consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
 
     # Gestione robusta degli input economici, con fallback a 0 se non validi
+    try:
+        prezzo_vendita_val = float(prezzo_vendita)
+    except (ValueError, TypeError):
+        prezzo_vendita_val = 0
     try:
         costo_acqua_val = float(costo_acqua)
     except (ValueError, TypeError):
@@ -201,7 +206,7 @@ def update_main_view(active_tab, *args):
     except (ValueError, TypeError):
         costi_extra_val = 0
 
-    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, costo_acqua_val, costo_fert_val, costi_extra_val)
+    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, prezzo_vendita_val, costo_acqua_val, costo_fert_val, costi_extra_val)
 
     fig_produttivo = px.bar(
         df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',

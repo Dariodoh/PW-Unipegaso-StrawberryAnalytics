@@ -8,7 +8,6 @@ CONSUMO_OTTIMALE_ACQUA = 500.0 # l/m², consumo ottimale stagionale d'acqua
 CONSUMO_OTTIMALE_FERT = 0.07 # kg/m², consumo otimale stagionale di fertilizzanti
 BENCHMARK_OTTIMALI = {'acqua': 500.0, # l/m², consumo ottimale stagionale d'acqua
                       'fertilizzanti': 0.07 } # kg/m², consumo ottimale stagionale di fertilizzanti
-PREZZO_VENDITA_FRAGOLE_AL_KG = 3.50      # Prezzo medio di vendita in €/kg
 
 PESI_FATTORI = {
     'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),'critico': (0.2, 0.4)},
@@ -110,7 +109,8 @@ def simula_consumo_risorse(fattori: dict) -> tuple[dict, dict]:
     return consumi_stimati, BENCHMARK_OTTIMALI
 
 
-def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq, costo_acqua_m3, costo_fert_kg, costi_extra_ha):
+def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq, prezzo_vendita_kg,
+                                   costo_acqua_m3, costo_fert_kg, costi_extra_ha):
     """
     Simula la performance finanziaria per metro quadro (m²).
 
@@ -123,7 +123,7 @@ def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq, costo_a
         dict: Un dizionario con Ricavi, Costi e Profitto Lordo, tutto per m².
     """
     # 1. Calcolo Ricavi per m²
-    ricavi_mq = produzione_kg_mq * PREZZO_VENDITA_FRAGOLE_AL_KG
+    ricavi_mq = produzione_kg_mq * prezzo_vendita_kg
 
     # 2. Calcolo Costi per m²
     # Converti consumo acqua da litri a metri cubi (1000L = 1m³)
