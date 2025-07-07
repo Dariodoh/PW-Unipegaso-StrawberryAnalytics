@@ -152,13 +152,13 @@ layout = dbc.Container([
     dbc.Card(
         dbc.CardBody([
             dbc.Row([
-                # Colonna sinistra per la spiegazione
+                # Colonna sinistra per il commento al grafico
                 dbc.Col([
-                    html.H4("Spiegazione del Grafico", id="titolo-spiegazione"),
+                    html.H4(id="titolo-commentary"),
                     html.Hr(),
-                    dcc.Markdown(id="testo-spiegazione",
+                    dcc.Markdown(id="testo-commentary",
                                  children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
-                ], width=4, className="explanation-column"),
+                ], width=4,style={'maxHeight': '700px', 'overflowY': 'auto', 'paddingRight': '15px'}, className="explanation-column"),
 
                 dbc.Col([
                     html.Div(

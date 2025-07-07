@@ -71,6 +71,7 @@ PRESETS = {
     }
 }
 
+
 @app.callback(
     Output("modale-tabella-mensile", "is_open"),
     Output("contenuto-tabella-mensile", "children"),
@@ -247,7 +248,7 @@ def update_dropdowns_from_preset(*button_clicks):
         Output('container-produttivo', 'style'),
         Output('container-risorse', 'style'),
         Output('container-finanziario', 'style'),
-        Output('testo-spiegazione', 'children')
+        Output('testo-commentary', 'children')
     ],
     [
         Input('tabs-viste-grafici', 'value'),
@@ -270,7 +271,6 @@ def update_main_view(active_tab,
                      temp, luce, umidita, irrigazione, fertilizzazione,
                      patogeni, raccolta, impollinazione, sistema,
                      prezzo_vendita, costo_acqua, costo_fert, costi_extra):
-
     # Prevenire l'aggiornamento se i dropdown non sono ancora stati caricati
     if not all([temp, luce, umidita, irrigazione, fertilizzazione, patogeni, raccolta, impollinazione, sistema]):
         raise PreventUpdate
@@ -309,19 +309,26 @@ def update_main_view(active_tab,
     except (ValueError, TypeError):
         costi_extra_val = 0
 
-    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, prezzo_vendita_val, costo_acqua_val, costo_fert_val, costi_extra_val)
+    dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, prezzo_vendita_val,
+                                                     costo_acqua_val, costo_fert_val, costi_extra_val)
 
     if active_tab == 'tab-produttivo':
-        spiegazione = f"""
-        Basandosi sui parametri di coltivazione selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
+        commentary = f"""
+    Basandosi sui parametri selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
 
-        Questo valore si confronta con i seguenti benchmark standard per il settore:
-        - **Produzione Ottimale**: 8.50 kg/m² (tipica di impianti ad alta tecnologia).
-        - **Produzione Media**: 5.50 kg/m² (risultato comune per aziende ben gestite).
-        - **Produzione Sfavorevole**: 3.00 kg/m² (in condizioni di stress o gestione non ideale).
+    Il grafico confronta questo risultato con i benchmark di riferimento, tipicamente associati alla coltura in suolo:
+    *   **Produzione Ottimale**: 8.50 kg/m²
+    *   **Produzione Media**: 5.50 kg/m²
+    *   **Produzione Sfavorevole**: 3.00 kg/m²
 
-        *Nota: questa è una simulazione basata su un modello. I risultati reali possono variare.*
-        """
+    La resa produttiva è il risultato diretto delle scelte effettuate. Si noti che il **Sistema di Coltura** è uno dei fattori più determinanti. 
+    
+    Mentre i sistemi tradizionali tendono ad allinearsi con fatica a questi benchmark, le tecnologie avanzate come il **Fuori Suolo** e soprattutto l'**Idroponica a Ricircolo** hanno il potenziale per superarli ampiamente. Questo perché permettono un controllo capillare dell'ambiente di crescita, massimizzando l'efficienza della pianta.
+
+    Utilizzando i **PRESET PER TIPO DI COLTURA** si può osservare direttamente questa dinamica e vedere come una gestione ottimale possa portare a risultati produttivi al di sopra dei **10 kh/m²**.
+
+    *Nota: questa è una stima basata su un modello simulativo.*
+    """
 
         fig_produttivo = px.bar(
             df_plot, x='Produzione (kg/m²)', y='Scenario', orientation='h',
@@ -339,21 +346,38 @@ def update_main_view(active_tab,
         max_range = max(produzione_simulata, 8.5) * 1.1
         fig_produttivo.update_xaxes(range=[0, max_range])
 
-        return fig_produttivo, no_update, no_update, no_update, style_visible, style_hidden, style_hidden, spiegazione
+        return fig_produttivo, no_update, no_update, no_update, style_visible, style_hidden, style_hidden, commentary
 
     elif active_tab == 'tab-risorse':
-        spiegazione = f"""
-                    Questa vista analizza l'efficienza nell'uso delle risorse. I valori stimati sono confrontati con un benchmark ottimale (linea nera).
-                    - **Consumo Acqua Stimato**: **{consumo_acqua_simulato:.0f} l/m²** (Ottimale: 300-450 l/m²).
-                    - **Consumo Fertilizzanti**: **{consumo_fertilizzanti_simulato:.3f} kg/m²** (Ottimale: 0.010-0.015 kg/m²).
-                    INSERIRE SPIEGAZIONE MODIFICA GRAFICO SE IDROPONICA
-                    """
+        commentary = f"""
+            Questa vista analizza l'efficienza nell'uso delle risorse idriche e nutritive, fondamentali per una produzione di qualità.
+
+            #### Utilizzo dell'Acqua
+            Il consumo stimato è di **{consumi_stimati['acqua']:.0f} l/m²**. Il range ottimale per colture in suolo è 300-450 l/m².
+            *   **Carenza (< 300 l/m²)**: Indica uno stress idrico che compromette la crescita della pianta e la pezzatura (dimensione) dei frutti.
+            *   **Spreco (> 650 l/m²)**: Rappresenta un costo economico e ambientale. Può creare condizioni di asfissia per le radici e favorire lo sviluppo di malattie fungine.
+
+            #### Utilizzo dei Fertilizzanti
+            Il consumo stimato è di **{consumi_stimati['fertilizzanti']:.3f} kg/m²**. Questo valore rappresenta il consumo totale di elementi, calcolato sui fabbisogni principali della fragola: **Azoto (N)**, **Fosforo (P₂O₅)** e **Potassio (K₂O)**.
+            *   **Carenza**: Limita fortemente lo sviluppo vegetativo, la fioritura e l'ingrossamento dei frutti, riducendo la qualità del raccolto.
+            *   **Eccesso**: Oltre a essere un costo inutile, può causare squilibri nutrizionali, eccessiva vegetazione a scapito dei frutti e potenziale inquinamento delle falde.
+            
+            In un sistema **Idroponico a Ricircolo**, i benchmark tradizionali vengono rivoluzionati: l'efficienza è massima perché acqua e nutrienti vengono recuperati e riutilizzati.
+            
+            **In questo scenario, un basso consumo non indica carenza, ma straordinaria efficienza.**
+
+            *   **Acqua**: Un valore così basso è un risultato eccellente, che riflette un risparmio idrico che può arrivare fino al 90% rispetto alla coltura in suolo. Lo spreco è quasi nullo.
+            *   **Fertilizzanti**: Anche qui, il basso consumo è indice di una gestione ottimale, dove ogni grammo di nutriente viene reso disponibile alla pianta, garantendo un risparmio fino al 60% rispetto alla coltura in suolo. 
+            
+            I grafici mostrano come questa tecnologia ridefinisca il concetto di "ottimale".
+            
+            *Nota: questa è una stima basata su un modello simulativo.*
+            """
 
         fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
                                     subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
 
         if fattori_agronomici['dd-sistema-colturale'] == 'idroponico_ricircolo':
-            spiegazione = f"""... testo specifico per idroponica ..."""
             # Gauge Acqua per Idroponica: più basso è, meglio è.
             gauge_acqua_steps = [{'range': [0, 100], 'color': "#7eb671"},  # Ottimale
                                  {'range': [100, 200], 'color': "gold"},  # Spreco
@@ -379,7 +403,6 @@ def update_main_view(active_tab,
                                 {'range': [0.020, 0.030], 'color': "#d13045"}]
             gauge_fert_range = [None, 0.030]
 
-
         fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumo_acqua_simulato, uid='gauge-acqua-uid',
                                            gauge={'axis': {'range': gauge_acqua_range}, 'bar': {'color': "#495b52"},
                                                   'steps': gauge_acqua_steps,
@@ -389,13 +412,13 @@ def update_main_view(active_tab,
                          number={'valueformat': '.3f'},
                          gauge={'axis': {'range': gauge_fert_range}, 'bar': {'color': "#495b52"},
                                 'steps': gauge_fert_steps,
-                                'threshold': {'value': 0.0125}}),row=1, col=2)
+                                'threshold': {'value': 0.0125}}), row=1, col=2)
 
-        fig_risorse.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
+        fig_risorse.update_layout(title_text="Stima del Consumo di Risorse", plot_bgcolor='rgba(0,0,0,0)',
                                   paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
                                   title_xanchor='center', transition_duration=500)
 
-        return no_update, fig_risorse, no_update, no_update, style_hidden, style_visible, style_hidden, spiegazione
+        return no_update, fig_risorse, no_update, no_update, style_hidden, style_visible, style_hidden, commentary
 
     elif active_tab == 'tab-finanziaria':
 
@@ -403,17 +426,28 @@ def update_main_view(active_tab,
         profitto_val = dati_finanziari['Profitto Lordo (€/m²)']
         costi_totali_val = ricavi_val - profitto_val
 
-        spiegazione = f"""
-            Questa vista offre un'analisi finanziaria dettagliata per metro quadro (€/m²).
-    
-            **A sinistra**, il **diagramma di Sankey** mostra il flusso economico complessivo:
-            - I **Ricavi** si suddividono in **Costi Totali** e nel **Profitto Lordo** finale.
-    
-            **A destra**, il **grafico a ciambella** analizza la composizione dei costi variabili, mostrando il peso percentuale di ogni voce.
-    
-            - **Ricavi Stimati**: **{ricavi_val:.2f} €/m²**
-            - **Profitto Lordo Stimato**: **{profitto_val:.2f} €/m²**
-            """
+        commentary = f"""
+        Questa sezione analizza la sostenibilità economica della coltivazione, mostrando come le scelte agronomiche e i parametri di mercato si traducono in profitto.
+
+        **Grafico di Flusso (Sankey)** a sinistra:
+        Illustra il percorso economico complessivo. I **Ricavi Totali ({ricavi_val:.2f} €/m²)**, generati dalla vendita della produzione, si dividono in due flussi: i **Costi Totali ({costi_totali_val:.2f} €/m²)** sostenuti e il **Profitto Lordo ({profitto_val:.2f} €/m²)** finale. Questo grafico evidenzia immediatamente la proporzione tra quanto si spende e quanto si guadagna.
+
+        **Grafico a Ciambella** a destra:
+        Offre uno spaccato dettagliato dei **costi variabili**. Mostra il peso percentuale di ogni voce, permettendo di capire quali fattori incidono maggiormente sulle spese.
+        
+        **Interazione e Analisi "What-if":**
+        Questa è la sezione più sensibile alle fluttuazioni di mercato. Modificando i **parametri economici** (soprattutto il **prezzo di vendita**) per osservare come un piccolo cambiamento possa avere un impatto enorme sul profitto. Un'alta produzione con un prezzo di vendita basso potrebbe essere meno redditizia di una produzione media venduta a un prezzo più alto.
+
+        **Cosa sono gli "Altri Costi Variabili"?**
+        Questa macro-categoria include tutte le spese operative non legate direttamente ad acqua e fertilizzanti, come ad esempio:
+        *   Manodopera per trapianto, gestione e raccolta.
+        *   Costo delle piantine e del materiale di propagazione.
+        *   Noleggio o acquisto di insetti impollinatori (bombi).
+        *   Energia elettrica per pompe e sistemi di controllo.
+        *   Materiali di consumo (es. substrati, teli per pacciamatura).
+        
+        *Nota: questa è una stima basata su un modello simulativo.*
+        """
 
         fig_sankey = go.Figure(data=[go.Sankey(node=dict(pad=15, thickness=20, line=dict(color="black", width=0.5),
                                                          label=["Ricavi", "Costi Totali", "Profitto Lordo"],
@@ -443,7 +477,7 @@ def update_main_view(active_tab,
                                     font=dict(color='#495b52'),
                                     title_x=0.5, title_xanchor='center', margin=dict(t=40, b=20, l=10, r=10))
 
-        return no_update, no_update, fig_sankey, fig_ciambella, style_hidden, style_hidden, style_visible, spiegazione
+        return no_update, no_update, fig_sankey, fig_ciambella, style_hidden, style_hidden, style_visible, commentary
 
     # Fallback nel caso active_tab non corrisponda a nessuna opzione
     return [no_update] * 8
