@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 
 PRODUZIONE_BASE_OTTIMALE = 10.0  # kg/m², potenziale massimo teorico stagionale
-BENCHMARK_OTTIMALI = {'acqua': 375.0, # l/m², consumo ottimale stagionale d'acqua
-                      'fertilizzanti': 0.0125 } # kg/m², consumo ottimale stagionale di fertilizzanti
+RANGE_OTTIMALE_ACQUA = (300, 450) # l/m², consumo ottimale stagionale d'acqua
+RANGE_OTTIMALE_FERTILIZZANTI = (0.010, 0.015) # kg/m², consumo ottimale stagionale di fertilizzanti
 
 PESI_FATTORI = {
     'dd-temperatura': {'ottimale': (0.95, 1.0), 'sub-freddo': (0.7, 0.85), 'sub-caldo': (0.6, 0.75),'critico': (0.2, 0.4)},
@@ -21,50 +21,50 @@ PESI_FATTORI = {
 
 IMPATTI_RISORSE = {
     'dd-temperatura': {
-        'ottimale': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'sub-freddo': {'acqua': 0.9, 'fertilizzanti': 0.95},
-        'sub-caldo': {'acqua': 1.25, 'fertilizzanti': 1.0},
-        'critico': {'acqua': 1.4, 'fertilizzanti': 0.8},
+        'ottimale': {'acqua': (-0.02, 0.02), 'fertilizzanti': (0.0, 0.0)},
+        'sub-freddo': {'acqua': (-0.15, -0.05), 'fertilizzanti': (-0.1, -0.0)},
+        'sub-caldo': {'acqua': (0.20, 0.30), 'fertilizzanti': (0.0, 0.0)},
+        'critico': {'acqua': (0.35, 0.45), 'fertilizzanti': (-0.25, -0.15)}, # Stress idrico > consumo acqua; stress termico < assorbimento nutrienti
     },
     'dd-luce': {
-        'alta': {'acqua': 1.0, 'fertilizzanti': 1.1},
-        'media': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'bassa': {'acqua': 0.95, 'fertilizzanti': 0.9},
+        'alta': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.05, 0.15)},
+        'media': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'bassa': {'acqua': (-0.1, -0.0), 'fertilizzanti': (-0.15, -0.05)},
     },
     'dd-umidita': {
-        'ottimale': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'alta_rischiosa': {'acqua': 0.85, 'fertilizzanti': 1.0},
-        'bassa_stress': {'acqua': 1.3, 'fertilizzanti': 1.0},
+        'ottimale': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'alta_rischiosa': {'acqua': (-0.2, -0.1), 'fertilizzanti': (0.0, 0.0)}, # Meno traspirazione
+        'bassa_stress': {'acqua': (0.25, 0.35), 'fertilizzanti': (0.0, 0.0)}, # Più traspirazione
     },
     'dd-irrigazione': {
-        'goccia': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'aspersione': {'acqua': 1.4, 'fertilizzanti': 1.2},
-        'manuale': {'acqua': 2.0, 'fertilizzanti': 1.5},
+        'goccia': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'aspersione': {'acqua': (0.35, 0.45), 'fertilizzanti': (0.15, 0.25)},
+        'manuale': {'acqua': (0.8, 1.2), 'fertilizzanti': (0.4, 0.6)},
     },
     'dd-fertilizzazione': {
-        'idroponica': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'fertirrigazione': {'acqua': 1.05, 'fertilizzanti': 1.15},
-        'organica': {'acqua': 1.1, 'fertilizzanti': 1.3},
+        'idroponica': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)}, # L'impatto è già gestito da sistema-colturale
+        'fertirrigazione': {'acqua': (0.0, 0.05), 'fertilizzanti': (0.1, 0.2)},
+        'organica': {'acqua': (0.05, 0.15), 'fertilizzanti': (0.25, 0.35)},
     },
-    'dd-patogeni': {
-        'integrata': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'biologica': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'convenzionale': {'acqua': 1.0, 'fertilizzanti': 1.0},
+    'dd-patogeni': { # Impatto nullo sul consumo, ma sulla produzione
+        'integrata': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'biologica': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'convenzionale': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
     },
-    'dd-frequenza-raccolta': {
-        'alta': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'media': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'bassa': {'acqua': 1.0, 'fertilizzanti': 1.0},
+    'dd-frequenza-raccolta': { # Impatto nullo sul consumo
+        'alta': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'media': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'bassa': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
     },
-    'dd-impollinazione': {
-        'bombi': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'manuale': {'acqua': 1.0, 'fertilizzanti': 1.0},
-        'naturale': {'acqua': 1.0, 'fertilizzanti': 1.0},
+    'dd-impollinazione': { # Impatto nullo sul consumo
+        'bombi': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'manuale': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
+        'naturale': {'acqua': (0.0, 0.0), 'fertilizzanti': (0.0, 0.0)},
     },
     'dd-sistema-colturale': {
-        'suolo_tradizionale': {'acqua': 1.5, 'fertilizzanti': 1.4}, # Meno efficiente
-        'soilless_aperto': {'acqua': 0.8, 'fertilizzanti': 0.7}, # Molto efficiente
-        'idroponico_ricircolo': {'acqua': 0.15, 'fertilizzanti': 0.4}, # Estremamente efficiente
+        'suolo_tradizionale': {'acqua': (0.4, 0.6), 'fertilizzanti': (0.3, 0.5)},
+        'soilless_aperto': {'acqua': (-0.25, -0.15), 'fertilizzanti': (-0.35, -0.25)},
+        'idroponico_ricircolo': {'acqua': (-0.9, -0.8), 'fertilizzanti': (-0.65, -0.55)},
     },
 }
 
@@ -86,25 +86,48 @@ def simula_produzione_annua(fattori_selezionati):
 
 def simula_consumo_risorse(fattori: dict) -> tuple[dict, dict]:
     """
-    Simula il consumo di acqua e fertilizzanti basandosi sul modello IMPATTI_RISORSE.
+    Simula il consumo di risorse partendo da un range ottimale e applicando
+    una somma di modificatori percentuali casuali basati sulle scelte agronomiche.
+    Mantiene la struttura del dizionario IMPATTI_RISORSE.
+
+    Args:
+        fattori (dict): Un dizionario con le scelte per ogni fattore (es. {'dd-temperatura': 'sub-caldo'}).
+
+    Returns:
+        dict: Un dizionario con 'acqua' (l/mq) e 'fertilizzanti' (kg/mq).
     """
 
-    fattore_acqua = 1.0
-    fattore_fertilizzanti = 1.0
+    mod_totale_acqua = 0.0
+    mod_totale_fertilizzanti = 0.0
 
-    # Calcola l'impatto usando il dizionario dedicato IMPATTI_RISORSE
-    for id_fattore, valore_selezionato in fattori.items():
-        if id_fattore in IMPATTI_RISORSE and valore_selezionato in IMPATTI_RISORSE[id_fattore]:
-            pesi = IMPATTI_RISORSE[id_fattore][valore_selezionato]
-            fattore_acqua *= pesi['acqua']
-            fattore_fertilizzanti *= pesi['fertilizzanti']
+    consumo_base_acqua = np.random.uniform(*RANGE_OTTIMALE_ACQUA)
+    consumo_base_fertilizzanti = np.random.uniform(*RANGE_OTTIMALE_FERTILIZZANTI)
 
-    consumi_stimati = {
-        'acqua': BENCHMARK_OTTIMALI['acqua'] * fattore_acqua,
-        'fertilizzanti': BENCHMARK_OTTIMALI['fertilizzanti'] * fattore_fertilizzanti
+    # Calcoliamo la somma dei modificatori iterando sui fattori scelti dall'utente
+    for id_fattore, scelta_utente in fattori.items():
+        if id_fattore in IMPATTI_RISORSE and scelta_utente in IMPATTI_RISORSE[id_fattore]:
+            modificatori = IMPATTI_RISORSE[id_fattore][scelta_utente]
+
+            # Estraiamo il range di modifica per l'acqua, scegliamo un valore casuale e lo sommiamo
+            range_mod_acqua = modificatori['acqua']
+            mod_totale_acqua += np.random.uniform(*range_mod_acqua)
+
+            # Facciamo lo stesso per i fertilizzanti
+            range_mod_fertilizzanti = modificatori['fertilizzanti']
+            mod_totale_fertilizzanti += np.random.uniform(*range_mod_fertilizzanti)
+
+    #Applichiamo i modificatori totali ai valori di base
+    consumo_finale_acqua = consumo_base_acqua * (1 + mod_totale_acqua)
+    consumo_finale_fertilizzanti = consumo_base_fertilizzanti * (1 + mod_totale_fertilizzanti)
+
+    #Assicuriamo che il consumo non diventi mai negativo
+    consumo_finale_acqua = max(0, consumo_finale_acqua)
+    consumo_finale_fertilizzanti = max(0, consumo_finale_fertilizzanti)
+
+    return {
+        'acqua': consumo_finale_acqua,
+        'fertilizzanti': consumo_finale_fertilizzanti
     }
-
-    return consumi_stimati, BENCHMARK_OTTIMALI
 
 
 def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq, prezzo_vendita_kg,

@@ -8,11 +8,16 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
-from data import prepare_benchmark_dataframe, simula_consumo_risorse, simula_performance_finanziaria, PESI_FATTORI
 
 # Importiamo le risorse necessarie
 from app import app
-from data import get_calendario_colturale_fragola
+from data import (
+    get_calendario_colturale_fragola,
+    prepare_benchmark_dataframe,
+    simula_consumo_risorse,
+    simula_performance_finanziaria,
+    IMPATTI_RISORSE
+)
 
 PRESETS = {
     "btn-preset-tradizionale": {
@@ -167,29 +172,45 @@ def update_dropdowns_from_preset(*button_clicks):
     ],
     [
         Input('tabs-viste-grafici', 'value'),
-        *[Input(id, 'value') for id in PESI_FATTORI.keys()],
+        Input('dd-temperatura', 'value'),
+        Input('dd-luce', 'value'),
+        Input('dd-umidita', 'value'),
+        Input('dd-irrigazione', 'value'),
+        Input('dd-fertilizzazione', 'value'),
+        Input('dd-patogeni', 'value'),
+        Input('dd-frequenza-raccolta', 'value'),
+        Input('dd-impollinazione', 'value'),
+        Input('dd-sistema-colturale', 'value'),
         Input('input-prezzo-vendita', 'value'),
         Input('input-costo-acqua', 'value'),
         Input('input-costo-fertilizzanti', 'value'),
         Input('input-costi-extra', 'value')
     ]
 )
-def update_main_view(active_tab, *args):
+def update_main_view(active_tab,
+                     temp, luce, umidita, irrigazione, fertilizzazione,
+                     patogeni, raccolta, impollinazione, sistema,
+                     prezzo_vendita, costo_acqua, costo_fert, costi_extra):
 
-    # Stili di default per i contenitori: tutti nascosti
+    # Prevenire l'aggiornamento se i dropdown non sono ancora stati caricati
+    if not all([temp, luce, umidita, irrigazione, fertilizzazione, patogeni, raccolta, impollinazione, sistema]):
+        raise PreventUpdate
+
+    # Stili per la visibilità dei container
     style_hidden = {'display': 'none'}
     style_visible = {'display': 'block', 'width': '100%'}
 
-    valori_dropdown = args[:9]
-    prezzo_vendita, costo_acqua, costo_fert, costi_extra = args[9:]
+    fattori_agronomici = {
+        'dd-temperatura': temp, 'dd-luce': luce, 'dd-umidita': umidita,
+        'dd-irrigazione': irrigazione, 'dd-fertilizzazione': fertilizzazione,
+        'dd-patogeni': patogeni, 'dd-frequenza-raccolta': raccolta,
+        'dd-impollinazione': impollinazione, 'dd-sistema-colturale': sistema
+    }
 
-    fattori = dict(zip(PESI_FATTORI.keys(), valori_dropdown))
-
-    if not all(valori_dropdown):
-        return [no_update] * 8
-
-    df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori)
-    consumi_stimati, benchmark_ottimali = simula_consumo_risorse(fattori)
+    df_plot, produzione_simulata = prepare_benchmark_dataframe(fattori_agronomici)
+    consumi_stimati = simula_consumo_risorse(fattori_agronomici)
+    consumo_acqua_simulato = consumi_stimati['acqua']
+    consumo_fertilizzanti_simulato = consumi_stimati['fertilizzanti']
 
     # Gestione robusta degli input economici, con fallback a 0 se non validi
     try:
@@ -210,11 +231,6 @@ def update_main_view(active_tab, *args):
         costi_extra_val = 0
 
     dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, prezzo_vendita_val, costo_acqua_val, costo_fert_val, costi_extra_val)
-
-    fig_produttivo = no_update
-    fig_risorse = no_update
-    fig_sankey = no_update
-    fig_ciambella = no_update
 
     if active_tab == 'tab-produttivo':
         spiegazione = f"""
@@ -237,7 +253,8 @@ def update_main_view(active_tab, *args):
         fig_produttivo.update_traces(uid='bar-prod-uid', textposition='outside',
                                      hovertemplate='<b>%{y}</b><br>Produzione: %{x:.2f} kg/m²<extra></extra>')
         fig_produttivo.update_layout(xaxis_title='Produzione (kg/m²)', yaxis_title=None, showlegend=False,
-                                     plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
+                                     plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                                     font=dict(color='#495b52'),
                                      title_x=0.5, title_xanchor='center', transition_duration=500)
 
         max_range = max(produzione_simulata, 8.5) * 1.1
@@ -248,27 +265,53 @@ def update_main_view(active_tab, *args):
     elif active_tab == 'tab-risorse':
         spiegazione = f"""
                     Questa vista analizza l'efficienza nell'uso delle risorse. I valori stimati sono confrontati con un benchmark ottimale (linea nera).
-                    - **Consumo Acqua Stimato**: **{consumi_stimati['acqua']:.0f} l/m²** (Ottimale: {benchmark_ottimali['acqua']:.0f} l/m²).
-                    - **Consumo Fertilizzanti**: **{consumi_stimati['fertilizzanti']:.3f} kg/m²** (Ottimale: {benchmark_ottimali['fertilizzanti']:.3f} kg/m²).
+                    - **Consumo Acqua Stimato**: **{consumo_acqua_simulato:.0f} l/m²** (Ottimale: 300-450 l/m²).
+                    - **Consumo Fertilizzanti**: **{consumo_fertilizzanti_simulato:.3f} kg/m²** (Ottimale: 0.010-0.015 kg/m²).
+                    INSERIRE SPIEGAZIONE MODIFICA GRAFICO SE IDROPONICA
                     """
 
         fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
                                     subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
-        fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumi_stimati['acqua'], uid='gauge-acqua-uid',
-                                           gauge={'axis': {'range': [None, 1000]}, 'bar': {'color': "#495b52"},
-                                                  'steps': [{'range': [0, 300], 'color': "#d13045"},
-                                                            {'range': [300, 450], 'color': "#7eb671"},
-                                                            {'range': [450, 650], 'color': "gold"},
-                                                            {'range': [650, 1000], 'color': "#d13045"}],
+
+        if fattori_agronomici['dd-sistema-colturale'] == 'idroponico_ricircolo':
+            spiegazione = f"""... testo specifico per idroponica ..."""
+            # Gauge Acqua per Idroponica: più basso è, meglio è.
+            gauge_acqua_steps = [{'range': [0, 100], 'color': "#7eb671"},  # Ottimale
+                                 {'range': [100, 200], 'color': "gold"},  # Spreco
+                                 {'range': [200, 1000], 'color': "#d13045"}]  # Grave spreco
+            gauge_acqua_range = [None, 250]
+
+            # Gauge Fertilizzanti per Idroponica
+            gauge_fert_steps = [{'range': [0, 0.008], 'color': "#7eb671"},  # Ottimale
+                                {'range': [0.008, 0.015], 'color': "gold"},
+                                {'range': [0.015, 0.035], 'color': "#d13045"}]
+            gauge_fert_range = [None, 0.02]
+        else:
+            # Gauge standard per Suolo
+            gauge_acqua_steps = [{'range': [0, 300], 'color': "#d13045"},
+                                 {'range': [300, 450], 'color': "#7eb671"},
+                                 {'range': [450, 650], 'color': "gold"},
+                                 {'range': [650, 1000], 'color': "#d13045"}]
+            gauge_acqua_range = [None, 1000]
+
+            gauge_fert_steps = [{'range': [0, 0.010], 'color': "#d13045"},
+                                {'range': [0.010, 0.015], 'color': "#7eb671"},
+                                {'range': [0.015, 0.020], 'color': "gold"},
+                                {'range': [0.020, 0.030], 'color': "#d13045"}]
+            gauge_fert_range = [None, 0.030]
+
+
+        fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumo_acqua_simulato, uid='gauge-acqua-uid',
+                                           gauge={'axis': {'range': gauge_acqua_range}, 'bar': {'color': "#495b52"},
+                                                  'steps': gauge_acqua_steps,
                                                   'threshold': {'value': 375}}), row=1, col=1)
         fig_risorse.add_trace(
-            go.Indicator(mode="gauge+number", value=consumi_stimati['fertilizzanti'], uid='gauge-fert-uid', number={'valueformat': '.3f'},
-                         gauge={'axis': {'range': [None, 0.030]}, 'bar': {'color': "#495b52"},
-                                'steps': [{'range': [0, 0.010], 'color': "#d13045"},
-                                          {'range': [0.010, 0.015], 'color': "#7eb671"},
-                                          {'range': [0.015, 0.020], 'color': "gold"},
-                                          {'range': [0.020, 0.030], 'color': "#d13045"}], 'threshold': {'value': 0.07}}),
-            row=1, col=2)
+            go.Indicator(mode="gauge+number", value=consumo_fertilizzanti_simulato, uid='gauge-fert-uid',
+                         number={'valueformat': '.3f'},
+                         gauge={'axis': {'range': gauge_fert_range}, 'bar': {'color': "#495b52"},
+                                'steps': gauge_fert_steps,
+                                'threshold': {'value': 0.07}}),row=1, col=2)
+
         fig_risorse.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
                                   paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
                                   title_xanchor='center', transition_duration=500)
@@ -282,42 +325,46 @@ def update_main_view(active_tab, *args):
         costi_totali_val = ricavi_val - profitto_val
 
         spiegazione = f"""
-                                Questa vista offre un'analisi finanziaria dettagliata per metro quadro (€/m²).
-
-                                **A sinistra**, il **diagramma di Sankey** mostra il flusso economico complessivo:
-                                - I **Ricavi** si suddividono in **Costi Totali** e nel **Profitto Lordo** finale.
-
-                                **A destra**, il **grafico a ciambella** analizza la composizione dei costi variabili, mostrando il peso percentuale di ogni voce.
-
-                                - **Ricavi Stimati**: **{ricavi_val:.2f} €/m²**
-                                - **Profitto Lordo Stimato**: **{profitto_val:.2f} €/m²**
-                                """
+            Questa vista offre un'analisi finanziaria dettagliata per metro quadro (€/m²).
+    
+            **A sinistra**, il **diagramma di Sankey** mostra il flusso economico complessivo:
+            - I **Ricavi** si suddividono in **Costi Totali** e nel **Profitto Lordo** finale.
+    
+            **A destra**, il **grafico a ciambella** analizza la composizione dei costi variabili, mostrando il peso percentuale di ogni voce.
+    
+            - **Ricavi Stimati**: **{ricavi_val:.2f} €/m²**
+            - **Profitto Lordo Stimato**: **{profitto_val:.2f} €/m²**
+            """
 
         fig_sankey = go.Figure(data=[go.Sankey(node=dict(pad=15, thickness=20, line=dict(color="black", width=0.5),
                                                          label=["Ricavi", "Costi Totali", "Profitto Lordo"],
-                                                         color=["#495b52", "#d13045", "#7eb671"]), uid='sankey-flow-uid',
+                                                         color=["#495b52", "#d13045", "#7eb671"]),
+                                               uid='sankey-flow-uid',
                                                link=dict(source=[0, 0], target=[1, 2],
                                                          value=[costi_totali_val, profitto_val]),
                                                node_hovertemplate='<b>%{label}</b><br>Valore: €%{value:.2f}<extra></extra>')])
-        fig_sankey.update_layout(title_text="Flusso Finanziario (€/m²)", font=dict(size=12, color='#495b52'), transition_duration=500,
+        fig_sankey.update_layout(title_text="Flusso Finanziario (€/m²)", font=dict(size=12, color='#495b52'),
+                                 transition_duration=500,
                                  plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
                                  margin=dict(t=40, b=20, l=10, r=10))
 
         costi_labels = ['Costo Acqua', 'Costo Fertilizzanti', 'Altri Costi']
         costi_values = [abs(dati_finanziari[k]) for k in costi_labels]
-        color_map = {'Costo Acqua': '#63cec7','Costo Fertilizzanti': '#7eb671','Altri Costi': 'gold'}
+        color_map = {'Costo Acqua': '#63cec7', 'Costo Fertilizzanti': '#7eb671', 'Altri Costi': 'gold'}
         final_colors = [color_map[label] for label in costi_labels]
 
         fig_ciambella = go.Figure(data=[
             go.Pie(labels=costi_labels, values=costi_values, hole=0.4, marker=dict(colors=final_colors),
                    # uid='pie-costs-uid',
-                   textposition='inside', textinfo='percent+label', hovertemplate='Costo: € %{value:.2f}<extra></extra>')])
+                   textposition='inside', textinfo='percent+label',
+                   hovertemplate='Costo: € %{value:.2f}<extra></extra>')])
         fig_ciambella.update_layout(title="Composizione dei Costi Variabili", showlegend=False,
                                     # transition_duration=500,
-                                    plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'),
+                                    plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+                                    font=dict(color='#495b52'),
                                     title_x=0.5, title_xanchor='center', margin=dict(t=40, b=20, l=10, r=10))
 
         return no_update, no_update, fig_sankey, fig_ciambella, style_hidden, style_hidden, style_visible, spiegazione
 
-        # Fallback
-    return ([no_update] * 8)
+    # Fallback nel caso active_tab non corrisponda a nessuna opzione
+    return [no_update] * 8
