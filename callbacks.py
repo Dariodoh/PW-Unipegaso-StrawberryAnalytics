@@ -128,6 +128,44 @@ def toggle_impollinazione_info_modal(n_open, n_close, is_open):
 
 
 @app.callback(
+    Output("modal-info-patogeni", "is_open"),
+    Output("contenuto-info-patogeni", "children"),
+    Input("btn-info-patogeni", "n_clicks"),
+    Input("btn-chiudi-modal-patogeni", "n_clicks"),
+    State("modal-info-patogeni", "is_open"),
+    prevent_initial_call=True
+)
+def toggle_patogeni_info_modal(n_open, n_close, is_open):
+    ctx = callback_context
+    if not ctx.triggered_id: raise PreventUpdate
+    button_id = ctx.triggered_id
+    if button_id == "btn-info-patogeni":
+        testo_informativo = """
+        La gestione delle malattie e dei parassiti è cruciale per la fragolicoltura. Le principali strategie si differenziano per approccio e impatto ambientale.
+
+        #### Lotta Integrata
+        È l'approccio più moderno ed equilibrato, promosso a livello europeo. Non mira a eliminare completamente i patogeni, ma a mantenerli sotto una soglia di danno economico. Si basa su:
+        *   **Monitoraggio costante** delle colture per intervenire solo quando necessario.
+        *   **Utilizzo prioritario di metodi naturali**: insetti utili (antagonisti), trappole, pratiche agronomiche preventive.
+        *   **Interventi chimici mirati**: si ricorre a fitofarmaci solo come ultima risorsa, scegliendo prodotti a basso impatto ambientale e selettivi, per preservare gli organismi utili.
+        
+        È la strategia che garantisce il miglior compromesso tra efficacia, sostenibilità economica e rispetto per l'ambiente.
+
+        ---
+
+        #### Lotta Biologica
+        Prevede l'uso **esclusivo** di organismi viventi (predatori, parassitoidi), microrganismi (funghi, batteri) o sostanze di origine naturale per controllare i patogeni. **Vieta completamente l'uso di fitofarmaci di sintesi**. Sebbene sia la scelta più ecologica, può risultare meno efficace in caso di forti infestazioni.
+
+        #### Lotta Convenzionale (o a Calendario)
+        È l'approccio tradizionale, basato su trattamenti con fitofarmaci di sintesi eseguiti a scadenze fisse ("a calendario"), indipendentemente dalla reale presenza del patogeno. Pur essendo efficace nel breve termine, presenta maggiori rischi di inquinamento, sviluppo di resistenze nei patogeni e danni agli insetti impollinatori.
+        """
+        contenuto = dcc.Markdown(testo_informativo, style={'textAlign': 'justify'})
+        return True, contenuto
+    if button_id == "btn-chiudi-modal-patogeni": return False, no_update
+    return is_open, no_update
+
+
+@app.callback(
     [
         Output("dd-temperatura", "value"),
         Output("dd-luce", "value"),
@@ -310,7 +348,7 @@ def update_main_view(active_tab,
                          number={'valueformat': '.3f'},
                          gauge={'axis': {'range': gauge_fert_range}, 'bar': {'color': "#495b52"},
                                 'steps': gauge_fert_steps,
-                                'threshold': {'value': 0.07}}),row=1, col=2)
+                                'threshold': {'value': 0.0125}}),row=1, col=2)
 
         fig_risorse.update_layout(title_text="Stima del Consumo di Risorse vs. Ottimale", plot_bgcolor='rgba(0,0,0,0)',
                                   paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,

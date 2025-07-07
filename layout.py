@@ -105,7 +105,8 @@ layout = dbc.Container([
             ], className="mb-3"),
             dbc.Row([
                 create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia', width="4"),
-                create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata', width="4"),
+                create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata',
+                                info_button_id="btn-info-patogeni", width="4"),
                 create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale',
                                 width="4")
             ], className="mb-3"),
@@ -234,5 +235,17 @@ layout = dbc.Container([
         id="modal-info-impollinazione",
         size="xl",
         is_open=False,
+    ),
+
+    # Modale per l'info patogeni
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Info: Controllo patogeni e Lotta Integrata")),
+        dbc.ModalBody(id="contenuto-info-patogeni"),
+        dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modal-patogeni", n_clicks=0)),
+    ],
+        id="modal-info-patogeni",
+        size="xl",
+        is_open=False,
     )
+
 ], fluid=True)
