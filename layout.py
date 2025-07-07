@@ -108,7 +108,7 @@ layout = dbc.Container([
                 create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata',
                                 info_button_id="btn-info-patogeni", width="4"),
                 create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale',
-                                width="4")
+                                info_button_id="btn-info-coltura", width="4")
             ], className="mb-3"),
         ]),
         className="mb-4 dropdown-panel-card"
@@ -228,7 +228,7 @@ layout = dbc.Container([
 
     # Modale per l'info impollinazione
     dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("Info: Impollinazione Controllata con Bombi")),
+        dbc.ModalHeader(dbc.ModalTitle("Impollinazione Controllata")),
         dbc.ModalBody(id="contenuto-info-impollinazione"),
         dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modal-impollinazione", n_clicks=0)),
     ],
@@ -239,11 +239,22 @@ layout = dbc.Container([
 
     # Modale per l'info patogeni
     dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle("Info: Controllo patogeni e Lotta Integrata")),
+        dbc.ModalHeader(dbc.ModalTitle("Controllo patogeni e Lotta Integrata")),
         dbc.ModalBody(id="contenuto-info-patogeni"),
         dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modal-patogeni", n_clicks=0)),
     ],
         id="modal-info-patogeni",
+        size="xl",
+        is_open=False,
+    ),
+
+    # Modale per l'info tipologia coltura
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Tipologia di Coltura")),
+        dbc.ModalBody(id="contenuto-info-coltura"),
+        dbc.ModalFooter(dbc.Button("Chiudi", id="btn-chiudi-modal-coltura", n_clicks=0)),
+    ],
+        id="modal-info-coltura",
         size="xl",
         is_open=False,
     )

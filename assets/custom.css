@@ -90,12 +90,14 @@ h4 {
     border-bottom-width: 2px !important;
 }
 
-#btn-chiudi-modale, #btn-chiudi-modal-impollinazione, #btn-chiudi-modal-patogeni {
+#btn-chiudi-modale, #btn-chiudi-modal-impollinazione,
+#btn-chiudi-modal-patogeni, #btn-chiudi-modal-coltura {
     background-color: #7eb671 !important;
     border-color: #7eb671 !important;
     color: white !important;
 }
-#btn-chiudi-modale:hover, #btn-chiudi-modal-impollinazione:hover, #btn-chiudi-modal-patogeni:hover {
+#btn-chiudi-modale:hover, #btn-chiudi-modal-impollinazione:hover,
+#btn-chiudi-modal-patogeni:hover, #btn-chiudi-modal-patogeni:hover {
     background-color: #495b52 !important;
     border-color: #495b52 !important;
 }

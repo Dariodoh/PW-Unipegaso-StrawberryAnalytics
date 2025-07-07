@@ -166,6 +166,47 @@ def toggle_patogeni_info_modal(n_open, n_close, is_open):
 
 
 @app.callback(
+    Output("modal-info-coltura", "is_open"),
+    Output("contenuto-info-coltura", "children"),
+    Input("btn-info-coltura", "n_clicks"),
+    Input("btn-chiudi-modal-coltura", "n_clicks"),
+    State("modal-info-coltura", "is_open"),
+    prevent_initial_call=True
+)
+def toggle_coltura_info_modal(n_open, n_close, is_open):
+    ctx = callback_context
+    if not ctx.triggered_id: raise PreventUpdate
+    button_id = ctx.triggered_id
+    if button_id == "btn-info-coltura":
+        testo_informativo = """
+        Il sistema di coltura definisce l'ambiente in cui le radici della pianta si sviluppano e assorbono nutrienti, influenzando drasticamente l'efficienza e la produttività.
+
+        #### Suolo Tradizionale
+        Le piante vengono coltivate direttamente nel terreno agricolo, in campo aperto o in serre. È il metodo più classico e diffuso.
+        *   **Punti di Forza**: Bassi costi iniziali di impianto, minore complessità tecnologica.
+        *   **Punti di Debolezza**: Maggiore consumo di acqua e fertilizzanti (dovuto a perdite per percolazione ed evaporazione), difficoltà nel controllare patogeni del suolo (stanchezza del terreno), produzione soggetta alle condizioni pedoclimatiche.
+
+        ---
+
+        #### Fuori Suolo (Soilless)
+        Le piante crescono in contenitori (vasi, sacchi) riempiti con un substrato inerte (es. fibra di cocco, perlite, torba) anziché nel terreno. L'irrigazione e la nutrizione sono fornite tramite fertirrigazione a goccia.
+        *   **Punti di Forza**: Eliminazione dei problemi legati ai patogeni del suolo, controllo preciso della nutrizione, maggiore efficienza nell'uso delle risorse rispetto al suolo, produzioni più uniformi e anticipate.
+        *   **Punti di Debolezza**: Costo più elevato dell'impianto, necessità di gestire il drenaggio della soluzione nutritiva in eccesso (ciclo aperto).
+
+        ---
+
+        #### Idroponico a Ricircolo (Ciclo Chiuso)
+        È la forma più avanzata di fuori suolo. Le radici sono immerse direttamente in una soluzione nutritiva liquida o in un film d'acqua che scorre in canali. Non c'è substrato solido o è minimo.
+        *   **Punti di Forza**: **Massima efficienza** nell'uso di acqua e fertilizzanti (rispettivo risparmio fino al 90% e 60%), grazie al recupero e riutilizzo della soluzione nutritiva. Controllo totale dell'ambiente radicale, densità di impianto più elevate e produzioni potenzialmente maggiori.
+        *   **Punti di Debolezza**: **Costi di impianto molto elevati**, alta dipendenza dalla tecnologia (pompe, sensori, sistemi di controllo), rischio di rapida diffusione di malattie radicali in tutto il sistema in caso di contaminazione.
+        """
+        contenuto = dcc.Markdown(testo_informativo, style={'textAlign': 'justify'})
+        return True, contenuto
+    if button_id == "btn-chiudi-modal-coltura": return False, no_update
+    return is_open, no_update
+
+
+@app.callback(
     [
         Output("dd-temperatura", "value"),
         Output("dd-luce", "value"),
