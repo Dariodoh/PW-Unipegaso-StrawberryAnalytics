@@ -383,37 +383,41 @@ def update_main_view(active_tab,
             gauge_acqua_steps = [{'range': [0, 100], 'color': "#7eb671"},  # Ottimale
                                  {'range': [100, 200], 'color': "gold"},  # Spreco
                                  {'range': [200, 1000], 'color': "#d13045"}]  # Grave spreco
-            gauge_acqua_range = [None, 250]
+            gauge_acqua_range = [0, 250]
+            acqua_threshold_value = 50
 
             # Gauge Fertilizzanti per Idroponica
             gauge_fert_steps = [{'range': [0, 0.008], 'color': "#7eb671"},  # Ottimale
                                 {'range': [0.008, 0.015], 'color': "gold"},
                                 {'range': [0.015, 0.035], 'color': "#d13045"}]
-            gauge_fert_range = [None, 0.02]
+            gauge_fert_range = [0, 0.02]
+            fert_threshold_value = 0.004
         else:
             # Gauge standard per Suolo
             gauge_acqua_steps = [{'range': [0, 300], 'color': "#d13045"},
                                  {'range': [300, 450], 'color': "#7eb671"},
                                  {'range': [450, 650], 'color': "gold"},
                                  {'range': [650, 1000], 'color': "#d13045"}]
-            gauge_acqua_range = [None, 1000]
+            gauge_acqua_range = [0, 1000]
+            acqua_threshold_value = 375
 
             gauge_fert_steps = [{'range': [0, 0.010], 'color': "#d13045"},
                                 {'range': [0.010, 0.015], 'color': "#7eb671"},
                                 {'range': [0.015, 0.020], 'color': "gold"},
                                 {'range': [0.020, 0.030], 'color': "#d13045"}]
-            gauge_fert_range = [None, 0.030]
+            gauge_fert_range = [0, 0.030]
+            fert_threshold_value = 0.0125
 
         fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumo_acqua_simulato, uid='gauge-acqua-uid',
                                            gauge={'axis': {'range': gauge_acqua_range}, 'bar': {'color': "#495b52"},
                                                   'steps': gauge_acqua_steps,
-                                                  'threshold': {'value': 375}}), row=1, col=1)
+                                                  'threshold': {'value': acqua_threshold_value}}), row=1, col=1)
         fig_risorse.add_trace(
             go.Indicator(mode="gauge+number", value=consumo_fertilizzanti_simulato, uid='gauge-fert-uid',
                          number={'valueformat': '.3f'},
                          gauge={'axis': {'range': gauge_fert_range}, 'bar': {'color': "#495b52"},
                                 'steps': gauge_fert_steps,
-                                'threshold': {'value': 0.0125}}), row=1, col=2)
+                                'threshold': {'value': fert_threshold_value}}), row=1, col=2)
 
         fig_risorse.update_layout(title_text="Stima del Consumo di Risorse", plot_bgcolor='rgba(0,0,0,0)',
                                   paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
