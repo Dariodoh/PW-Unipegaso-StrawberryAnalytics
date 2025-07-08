@@ -314,9 +314,10 @@ def update_main_view(active_tab,
 
     if active_tab == 'tab-produttivo':
         commentary = f"""
-    Basandosi sui parametri selezionati, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
+    Questa sezione analizza i parametri selezionati al fine di determinare una stima di produzione annuale.
+    Basandosi sui suddetti parametri, la produzione annua stimata è di **{produzione_simulata:.2f} kg/m²**.
 
-    Il grafico confronta questo risultato con i benchmark di riferimento, tipicamente associati alla coltura in suolo:
+    Il grafico confronta questo risultato con i benchmark di riferimento:
     *   **Produzione Ottimale**: 8.50 kg/m²
     *   **Produzione Media**: 5.50 kg/m²
     *   **Produzione Sfavorevole**: 3.00 kg/m²
@@ -325,7 +326,7 @@ def update_main_view(active_tab,
     
     Mentre i sistemi tradizionali tendono ad allinearsi con fatica a questi benchmark, le tecnologie avanzate come il **Fuori Suolo** e soprattutto l'**Idroponica a Ricircolo** hanno il potenziale per superarli ampiamente. Questo perché permettono un controllo capillare dell'ambiente di crescita, massimizzando l'efficienza della pianta.
 
-    Utilizzando i **PRESET PER TIPO DI COLTURA** si può osservare direttamente questa dinamica e vedere come una gestione ottimale possa portare a risultati produttivi al di sopra dei **10 kh/m²**.
+    Utilizzando i **PRESET PER TIPO DI COLTURA** si può osservare direttamente questa dinamica e vedere come una gestione ottimale possa portare a risultati produttivi al di sopra dei **10 kg/m²**.
 
     *Nota: questa è una stima basata su un modello simulativo.*
     """
@@ -350,24 +351,24 @@ def update_main_view(active_tab,
 
     elif active_tab == 'tab-risorse':
         commentary = f"""
-            Questa vista analizza l'efficienza nell'uso delle risorse idriche e nutritive, fondamentali per una produzione di qualità.
+            Questa sezione analizza l'efficienza nell'uso delle risorse idriche e nutritive, fondamentali per una produzione di qualità.
 
             #### Utilizzo dell'Acqua
-            Il consumo stimato è di **{consumi_stimati['acqua']:.0f} l/m²**. Il range ottimale per colture in suolo è 300-450 l/m².
-            *   **Carenza (< 300 l/m²)**: Indica uno stress idrico che compromette la crescita della pianta e la pezzatura (dimensione) dei frutti.
-            *   **Spreco (> 650 l/m²)**: Rappresenta un costo economico e ambientale. Può creare condizioni di asfissia per le radici e favorire lo sviluppo di malattie fungine.
+            Il consumo stimato è di **{consumi_stimati['acqua']:.0f} l/m²**. Il range ottimale è 300-450 l/m². Condizioni sfavorevoli possono indicare:
+            *   **Carenza (< 300 l/m²)**: indica uno stress idrico che compromette la crescita della pianta e la pezzatura (dimensione) dei frutti.
+            *   **Spreco (> 650 l/m²)**: rappresenta un impatto economico e ambientale considerevole. Può creare condizioni di asfissia per le radici e favorire lo sviluppo di malattie fungine.
 
             #### Utilizzo dei Fertilizzanti
-            Il consumo stimato è di **{consumi_stimati['fertilizzanti']:.3f} kg/m²**. Questo valore rappresenta il consumo totale di elementi, calcolato sui fabbisogni principali della fragola: **Azoto (N)**, **Fosforo (P₂O₅)** e **Potassio (K₂O)**.
-            *   **Carenza**: Limita fortemente lo sviluppo vegetativo, la fioritura e l'ingrossamento dei frutti, riducendo la qualità del raccolto.
-            *   **Eccesso**: Oltre a essere un costo inutile, può causare squilibri nutrizionali, eccessiva vegetazione a scapito dei frutti e potenziale inquinamento delle falde.
+            Il consumo stimato è di **{consumi_stimati['fertilizzanti']:.3f} kg/m²**. Questo valore rappresenta il consumo totale di elementi, calcolato sui fabbisogni principali della fragola: **Azoto (N)**, **Fosforo (P₂O₅)** e **Potassio (K₂O)**. Condizioni sfavorevoli possono indicare:
+            *   **Carenza (< 0.01 kg/m²)**: limita fortemente lo sviluppo vegetativo, la fioritura e l'ingrossamento dei frutti, riducendo la qualità del raccolto.
+            *   **Eccesso (> 0.02 kg/m²)**: oltre a essere un costo superfluo, può causare squilibri nutrizionali, eccessiva vegetazione a scapito dei frutti e potenziale inquinamento delle falde.
             
             In un sistema **Idroponico a Ricircolo**, i benchmark tradizionali vengono rivoluzionati: l'efficienza è massima perché acqua e nutrienti vengono recuperati e riutilizzati.
             
-            **In questo scenario, un basso consumo non indica carenza, ma straordinaria efficienza.**
+            **In questo scenario, un basso consumo non indica carenza, ma concreta efficienza.**
 
-            *   **Acqua**: Un valore così basso è un risultato eccellente, che riflette un risparmio idrico che può arrivare fino al 90% rispetto alla coltura in suolo. Lo spreco è quasi nullo.
-            *   **Fertilizzanti**: Anche qui, il basso consumo è indice di una gestione ottimale, dove ogni grammo di nutriente viene reso disponibile alla pianta, garantendo un risparmio fino al 60% rispetto alla coltura in suolo. 
+            *   **Acqua**: minore sarà il valore, più il risultato sarà considerato eccellente, riflettendo un risparmio idrico che può arrivare fino al 90% rispetto alla coltura in suolo. Lo spreco è quasi nullo.
+            *   **Fertilizzanti**: allo stesso modo, il basso consumo è indice di una gestione ottimale, in ogni grammo di nutriente viene reso disponibile alla pianta, limitando la dispersione/spreco e garantendo un risparmio fino al 60% rispetto alla coltura in suolo. 
             
             I grafici mostrano come questa tecnologia ridefinisca il concetto di "ottimale".
             
@@ -429,19 +430,19 @@ def update_main_view(active_tab,
         commentary = f"""
         Questa sezione analizza la sostenibilità economica della coltivazione, mostrando come le scelte agronomiche e i parametri di mercato si traducono in profitto.
 
+        **Interazione e Analisi "What-if":**
+        questa è la sezione più sensibile alle fluttuazioni di mercato. Modificando i **parametri economici** (soprattutto il **prezzo di vendita**) si può osservare come un piccolo cambiamento possa avere un impatto enorme sul profitto. Ad esempio, una produzione alta ad un prezzo di vendita basso potrebbe risultare meno redditizia di una produzione media venduta ad un prezzo più alto.
+
         **Grafico di Flusso (Sankey)** a sinistra:
-        Illustra il percorso economico complessivo. I **Ricavi Totali ({ricavi_val:.2f} €/m²)**, generati dalla vendita della produzione, si dividono in due flussi: i **Costi Totali ({costi_totali_val:.2f} €/m²)** sostenuti e il **Profitto Lordo ({profitto_val:.2f} €/m²)** finale. Questo grafico evidenzia immediatamente la proporzione tra quanto si spende e quanto si guadagna.
+        illustra il percorso economico complessivo. I **Ricavi Totali ({ricavi_val:.2f} €/m²)**, generati dalla vendita della produzione, si dividono in due flussi: i **Costi Totali ({costi_totali_val:.2f} €/m²)** sostenuti e il **Profitto Lordo ({profitto_val:.2f} €/m²)** finale. Questo grafico evidenzia immediatamente la proporzione tra costi e ricavi.
 
         **Grafico a Ciambella** a destra:
-        Offre uno spaccato dettagliato dei **costi variabili**. Mostra il peso percentuale di ogni voce, permettendo di capire quali fattori incidono maggiormente sulle spese.
-        
-        **Interazione e Analisi "What-if":**
-        Questa è la sezione più sensibile alle fluttuazioni di mercato. Modificando i **parametri economici** (soprattutto il **prezzo di vendita**) per osservare come un piccolo cambiamento possa avere un impatto enorme sul profitto. Un'alta produzione con un prezzo di vendita basso potrebbe essere meno redditizia di una produzione media venduta a un prezzo più alto.
+        offre uno spaccato dettagliato dei **costi variabili**. Mostra il peso percentuale di ogni voce, consentendo di comprendere quali fattori incidono maggiormente sulle spese.
 
-        **Cosa sono gli "Altri Costi Variabili"?**
-        Questa macro-categoria include tutte le spese operative non legate direttamente ad acqua e fertilizzanti, come ad esempio:
+        **Cosa si intende per "Altri Costi Variabili":**
+        questa macro-categoria include tutte le spese operative non legate direttamente ad acqua e fertilizzanti, come ad esempio:
         *   Manodopera per trapianto, gestione e raccolta.
-        *   Costo delle piantine e del materiale di propagazione.
+        *   Costo delle piante e del materiale di propagazione.
         *   Noleggio o acquisto di insetti impollinatori (bombi).
         *   Energia elettrica per pompe e sistemi di controllo.
         *   Materiali di consumo (es. substrati, teli per pacciamatura).

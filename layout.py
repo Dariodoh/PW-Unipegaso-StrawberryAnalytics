@@ -79,7 +79,7 @@ OPTIONS_UMIDITA = [
     {'label': '< 60%', 'value': 'bassa_stress'},
 ]
 OPTIONS_SISTEMA = [
-    {'label': 'In Suolo Tradizionale', 'value': 'suolo_tradizionale'},
+    {'label': 'In Suolo/Tradizionale', 'value': 'suolo_tradizionale'},
     {'label': 'Fuori Suolo (Drenaggio a perdere)', 'value': 'soilless_aperto'},
     {'label': 'Idroponico (Ricircolo)', 'value': 'idroponico_ricircolo'},
 ]
