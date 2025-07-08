@@ -1,19 +1,16 @@
-# file: layout.py
-
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from app import app
 
 
-# --- Funzione Helper per creare i dropdown in modo pulito ---
+# --- Funzione Helper per creare i dropdown ---
 def create_dropdown(title, control_id, options, default_value, width, info_button_id=None):
     """
     Crea un label (con un pulsante info opzionale) e un dropdown.
     """
-    # Il titolo ora può contenere più elementi (label + bottone)
     label_content = [html.Label(f"{title}:", className="form-label")]
     if info_button_id:
-        # Se viene fornito un ID, aggiungiamo un piccolo pulsante 'i'
+        # Creazione del bottone INFO se viene passato un button_id
         label_content.append(
             dbc.Button(
                 "info", id=info_button_id, size="sm", color="info",
@@ -35,7 +32,7 @@ def create_dropdown(title, control_id, options, default_value, width, info_butto
     )
 
 
-# --- Definiamo qui le opzioni per i dropdown ---
+# --- Opzioni per i dropdown ---
 OPTIONS_TEMPERATURA = [
     {'label': '18-24°C', 'value': 'ottimale'},
     {'label': '12-17°C', 'value': 'sub-freddo'},
@@ -84,7 +81,7 @@ OPTIONS_SISTEMA = [
     {'label': 'Idroponico (Ricircolo)', 'value': 'idroponico_ricircolo'},
 ]
 
-# --- Definizione del Layout Principale ---
+# --- Layout Principale ---
 layout = dbc.Container([
     dbc.Row([
         dbc.Col(html.Img(src=app.get_asset_url('logo.jpg'), height="150px"), width=12,
@@ -115,7 +112,7 @@ layout = dbc.Container([
     ),
 
     dbc.Row([
-        # Colonna per il primo gruppo di preset
+        # Preset tipo di coltura
         dbc.Col([
             html.H4("Preset per tipo di coltura"),
             dbc.ButtonGroup([
@@ -125,7 +122,7 @@ layout = dbc.Container([
             ])
         ], width=5),
 
-        # Colonna per il secondo gruppo di preset
+        # Preset per condizioni sfavorevoli/medie/ottimali
         dbc.Col([
             html.H4("Preset per condizioni"),
             dbc.ButtonGroup([
@@ -135,7 +132,7 @@ layout = dbc.Container([
             ])
         ], width=5),
 
-        # Colonna per il pulsante singolo
+        # Pulsante Distribuzione Mensile
         dbc.Col([
             dbc.Button("Distribuzione Mensile", id="btn-distribuzione-mensile", n_clicks=0,
                        className="custom-button-green")
@@ -160,6 +157,7 @@ layout = dbc.Container([
                                  children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
                 ], width=4,style={'maxHeight': '700px', 'overflowY': 'auto', 'paddingRight': '15px'}, className="explanation-column"),
 
+                # Colonna destra per il plot dei diversi grafici
                 dbc.Col([
                     html.Div(
                         id='container-produttivo',

@@ -1,5 +1,3 @@
-# file: data.py
-
 import pandas as pd
 import numpy as np
 
@@ -103,24 +101,24 @@ def simula_consumo_risorse(fattori: dict) -> tuple[dict, dict]:
     consumo_base_acqua = np.random.uniform(*RANGE_OTTIMALE_ACQUA)
     consumo_base_fertilizzanti = np.random.uniform(*RANGE_OTTIMALE_FERTILIZZANTI)
 
-    # Calcoliamo la somma dei modificatori iterando sui fattori scelti dall'utente
+    # Iterazione sui fattori scelti dall'utente per calcolarne la somma
     for id_fattore, scelta_utente in fattori.items():
         if id_fattore in IMPATTI_RISORSE and scelta_utente in IMPATTI_RISORSE[id_fattore]:
             modificatori = IMPATTI_RISORSE[id_fattore][scelta_utente]
 
-            # Estraiamo il range di modifica per l'acqua, scegliamo un valore casuale e lo sommiamo
+            # Estrazione del range di modifica per l'acqua, scelta del valore casuale e somma
             range_mod_acqua = modificatori['acqua']
             mod_totale_acqua += np.random.uniform(*range_mod_acqua)
 
-            # Facciamo lo stesso per i fertilizzanti
+            # Estrazione del range di modifica per i fertilizzanti, scelta del valore casuale e somma
             range_mod_fertilizzanti = modificatori['fertilizzanti']
             mod_totale_fertilizzanti += np.random.uniform(*range_mod_fertilizzanti)
 
-    #Applichiamo i modificatori totali ai valori di base
+    #Modificatori totali applicati ai valori di base
     consumo_finale_acqua = consumo_base_acqua * (1 + mod_totale_acqua)
     consumo_finale_fertilizzanti = consumo_base_fertilizzanti * (1 + mod_totale_fertilizzanti)
 
-    #Assicuriamo che il consumo non diventi mai negativo
+    #Valori sempre postivi
     consumo_finale_acqua = max(0, consumo_finale_acqua)
     consumo_finale_fertilizzanti = max(0, consumo_finale_fertilizzanti)
 
@@ -143,23 +141,23 @@ def simula_performance_finanziaria(produzione_kg_mq, consumi_risorse_mq, prezzo_
     Returns:
         dict: Un dizionario con Ricavi, Costi e Profitto Lordo, tutto per m².
     """
-    # 1. Calcolo Ricavi per m²
+    # Calcolo Ricavi per m²
     ricavi_mq = produzione_kg_mq * prezzo_vendita_kg
 
-    # 2. Calcolo Costi per m²
-    # Converti consumo acqua da litri a metri cubi (1000L = 1m³)
+    # Calcolo Costi per m²
+    # Conversione consumo acqua litri -> metri cubi
     costo_acqua_mq = (consumi_risorse_mq['acqua'] / 1000) * costo_acqua_m3
     costo_fertilizzanti_mq = consumi_risorse_mq['fertilizzanti'] * costo_fert_kg
 
-    # Converti costi extra da €/Ha a €/m² (1 Ha = 10.000 m²)
+    # Conversione costi extra €/Ha -> €/m²
     altri_costi_mq = costi_extra_ha / 10000
 
     costi_totali_mq = costo_acqua_mq + costo_fertilizzanti_mq + altri_costi_mq
 
-    # 3. Calcolo Profitto Lordo per m²
+    # Calcolo Profitto Lordo per m²
     profitto_lordo_mq = ricavi_mq - costi_totali_mq
 
-    # Restituisce un dizionario pronto per il grafico a cascata
+    # Dizionario pronto per il grafico a cascata
     return {
         "Ricavi (€/m²)": ricavi_mq,
         "Costo Acqua": -costo_acqua_mq,
@@ -180,13 +178,13 @@ def prepare_benchmark_dataframe(fattori: dict) -> tuple[pd.DataFrame, float]:
         tuple[pd.DataFrame, float]: Un DataFrame per il grafico a barre e
                                       il valore numerico della produzione simulata.
     """
-    # 1. Calcola il valore della produzione simulata
+    # Calcolo del valore della produzione simulata
     produzione_simulata = simula_produzione_annua(fattori)
 
-    # 2. Definisce i benchmark di confronto
+    # 2. Benchmark di confronto
     benchmark = {'Sfavorevole': 3.0, 'Media': 5.5, 'Ottimale': 8.5}
 
-    # 3. Prepara i dati per il DataFrame
+    # Preparazione dei dati per il DataFrame
     data_to_plot = {
         'Scenario': ['Produzione Stimata', 'Produzione Sfavorevole', 'Produzione Media', 'Produzione Ottimale'],
         'Produzione (kg/m²)': [
@@ -197,10 +195,10 @@ def prepare_benchmark_dataframe(fattori: dict) -> tuple[pd.DataFrame, float]:
         ]
     }
 
-    # 4. Crea il DataFrame
+    # 4. Creazione del DataFrame
     df_plot = pd.DataFrame(data_to_plot)
 
-    # 5. Restituisce sia il DataFrame che il valore numerico
+    # Return del DataFrame e del valore numerico
     return df_plot, produzione_simulata
 
 

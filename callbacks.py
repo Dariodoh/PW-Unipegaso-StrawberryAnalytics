@@ -1,5 +1,3 @@
-# file: callbacks.py
-
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
@@ -9,16 +7,15 @@ from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
 
-# Importiamo le risorse necessarie
 from app import app
 from data import (
     get_calendario_colturale_fragola,
     prepare_benchmark_dataframe,
     simula_consumo_risorse,
-    simula_performance_finanziaria,
-    IMPATTI_RISORSE
+    simula_performance_finanziaria
 )
 
+# Dizionario dei PRESETS per modificare simultaneamente i fattori
 PRESETS = {
     "btn-preset-tradizionale": {
         'dd-temperatura': 'sub-freddo',
@@ -71,7 +68,7 @@ PRESETS = {
     }
 }
 
-
+# Chiamata al modale per la costruzione della tabella Distribuzione Mensile
 @app.callback(
     Output("modale-tabella-mensile", "is_open"),
     Output("contenuto-tabella-mensile", "children"),
@@ -97,6 +94,7 @@ def toggle_and_fill_modal(n_open, n_close, is_open):
     return is_open, no_update
 
 
+# Chiamata di apertura/chiusura al modale per la costruzione delle INFO su Impollinazione
 @app.callback(
     Output("modal-info-impollinazione", "is_open"),
     Output("contenuto-info-impollinazione", "children"),
@@ -128,6 +126,7 @@ def toggle_impollinazione_info_modal(n_open, n_close, is_open):
     return is_open, no_update
 
 
+# Chiamata di apertura/chiusura al modale per la costruzione delle INFO su Controllo Patogeni
 @app.callback(
     Output("modal-info-patogeni", "is_open"),
     Output("contenuto-info-patogeni", "children"),
@@ -166,6 +165,7 @@ def toggle_patogeni_info_modal(n_open, n_close, is_open):
     return is_open, no_update
 
 
+# Chiamata di apertura/chiusura al modale per la costruzione delle INFO su Tipologia di Coltura
 @app.callback(
     Output("modal-info-coltura", "is_open"),
     Output("contenuto-info-coltura", "children"),
@@ -207,6 +207,7 @@ def toggle_coltura_info_modal(n_open, n_close, is_open):
     return is_open, no_update
 
 
+# Chiamata di aggiornamento valori dei dropdown dai PRESETS
 @app.callback(
     [
         Output("dd-temperatura", "value"),
@@ -237,6 +238,7 @@ def update_dropdowns_from_preset(*button_clicks):
     return [no_update] * 9
 
 
+# Chiamata di aggiornamento tab per commento grafico dinamico e plot grafici
 @app.callback(
     # Aggiorniamo le figure
     [
@@ -271,7 +273,7 @@ def update_main_view(active_tab,
                      temp, luce, umidita, irrigazione, fertilizzazione,
                      patogeni, raccolta, impollinazione, sistema,
                      prezzo_vendita, costo_acqua, costo_fert, costi_extra):
-    # Prevenire l'aggiornamento se i dropdown non sono ancora stati caricati
+    # Previene l'aggiornamento se i dropdown non sono ancora stati caricati
     if not all([temp, luce, umidita, irrigazione, fertilizzazione, patogeni, raccolta, impollinazione, sistema]):
         raise PreventUpdate
 
@@ -291,7 +293,7 @@ def update_main_view(active_tab,
     consumo_acqua_simulato = consumi_stimati['acqua']
     consumo_fertilizzanti_simulato = consumi_stimati['fertilizzanti']
 
-    # Gestione robusta degli input economici, con fallback a 0 se non validi
+    # Gestione degli input per Performance Finanziaria, con fallback a 0 se non validi
     try:
         prezzo_vendita_val = float(prezzo_vendita)
     except (ValueError, TypeError):
@@ -312,6 +314,7 @@ def update_main_view(active_tab,
     dati_finanziari = simula_performance_finanziaria(produzione_simulata, consumi_stimati, prezzo_vendita_val,
                                                      costo_acqua_val, costo_fert_val, costi_extra_val)
 
+    # Commento dinamico e plot del grafico del tab Andamento Produttivo
     if active_tab == 'tab-produttivo':
         commentary = f"""
     Questa sezione analizza i parametri selezionati al fine di determinare una stima di produzione annuale.
@@ -349,6 +352,7 @@ def update_main_view(active_tab,
 
         return fig_produttivo, no_update, no_update, no_update, style_visible, style_hidden, style_hidden, commentary
 
+    # Commento dinamico e plot dei grafici del tab Uso delle Risorse
     elif active_tab == 'tab-risorse':
         commentary = f"""
             Questa sezione analizza l'efficienza nell'uso delle risorse idriche e nutritive, fondamentali per una produzione di qualità.
@@ -378,22 +382,23 @@ def update_main_view(active_tab,
         fig_risorse = make_subplots(rows=1, cols=2, specs=[[{'type': 'indicator'}, {'type': 'indicator'}]],
                                     subplot_titles=('Acqua (l/m²)', 'Fertilizzanti (kg/m²)'))
 
+        # Discrimine dei range sfavorevoli/medi/ottimali per coltura di tipo idroponica
         if fattori_agronomici['dd-sistema-colturale'] == 'idroponico_ricircolo':
-            # Gauge Acqua per Idroponica: più basso è, meglio è.
-            gauge_acqua_steps = [{'range': [0, 100], 'color': "#7eb671"},  # Ottimale
-                                 {'range': [100, 200], 'color': "gold"},  # Spreco
-                                 {'range': [200, 1000], 'color': "#d13045"}]  # Grave spreco
+            gauge_acqua_steps = [{'range': [0, 100], 'color': "#7eb671"},
+                                 {'range': [100, 200], 'color': "gold"},
+                                 {'range': [200, 1000], 'color': "#d13045"}]
             gauge_acqua_range = [0, 250]
             acqua_threshold_value = 50
 
             # Gauge Fertilizzanti per Idroponica
-            gauge_fert_steps = [{'range': [0, 0.008], 'color': "#7eb671"},  # Ottimale
+            gauge_fert_steps = [{'range': [0, 0.008], 'color': "#7eb671"},
                                 {'range': [0.008, 0.015], 'color': "gold"},
                                 {'range': [0.015, 0.035], 'color': "#d13045"}]
             gauge_fert_range = [0, 0.02]
             fert_threshold_value = 0.004
+
+        # Discrimine dei range sfavorevoli/medi/ottimali per coltura di altro tipo
         else:
-            # Gauge standard per Suolo
             gauge_acqua_steps = [{'range': [0, 300], 'color': "#d13045"},
                                  {'range': [300, 450], 'color': "#7eb671"},
                                  {'range': [450, 650], 'color': "gold"},
@@ -425,6 +430,7 @@ def update_main_view(active_tab,
 
         return no_update, fig_risorse, no_update, no_update, style_hidden, style_visible, style_hidden, commentary
 
+    # Commento dinamico e plot dei grafici del tab Performance Finanziaria
     elif active_tab == 'tab-finanziaria':
 
         ricavi_val = dati_finanziari['Ricavi (€/m²)']
@@ -473,16 +479,14 @@ def update_main_view(active_tab,
 
         fig_ciambella = go.Figure(data=[
             go.Pie(labels=costi_labels, values=costi_values, hole=0.4, marker=dict(colors=final_colors),
-                   # uid='pie-costs-uid',
                    textposition='inside', textinfo='percent+label',
                    hovertemplate='Costo: € %{value:.2f}<extra></extra>')])
         fig_ciambella.update_layout(title="Composizione dei Costi Variabili", showlegend=False,
-                                    # transition_duration=500,
                                     plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
                                     font=dict(color='#495b52'),
                                     title_x=0.5, title_xanchor='center', margin=dict(t=40, b=20, l=10, r=10))
 
         return no_update, no_update, fig_sankey, fig_ciambella, style_hidden, style_hidden, style_visible, commentary
 
-    # Fallback nel caso active_tab non corrisponda a nessuna opzione
+    # Fallback per valore di active_tab diverso
     return [no_update] * 8
