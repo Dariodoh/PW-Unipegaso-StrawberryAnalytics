@@ -4,7 +4,7 @@ from app import app
 
 
 # --- Funzione Helper per creare i dropdown ---
-def create_dropdown(title, control_id, options, default_value, width, info_button_id=None):
+def create_dropdown(title, control_id, options, default_value, col_args, info_button_id=None):
     """
     Crea un label (con un pulsante info opzionale) e un dropdown.
     """
@@ -28,7 +28,8 @@ def create_dropdown(title, control_id, options, default_value, width, info_butto
                 clearable=False
             )
         ]),
-        width=width
+        **col_args,
+        className="mb-3"
     )
 
 
@@ -91,22 +92,22 @@ layout = dbc.Container([
     dbc.Card(
         dbc.CardBody([
             dbc.Row([
-                create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale', width="2"),
-                create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media', width="2"),
-                create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale', width="2"),
+                create_dropdown("Temperatura", "dd-temperatura", OPTIONS_TEMPERATURA, 'ottimale', col_args={'lg': 2, 'md': 4, 'sm': 6}),
+                create_dropdown("Luce", "dd-luce", OPTIONS_LUCE, 'media', col_args={'lg': 2, 'md': 4, 'sm': 6}),
+                create_dropdown("Umidità Relativa", "dd-umidita", OPTIONS_UMIDITA, 'ottimale', col_args={'lg': 2, 'md': 4, 'sm': 6}),
                 create_dropdown("Fertilizzazione", "dd-fertilizzazione", OPTIONS_FERTILIZZAZIONE, 'fertirrigazione',
-                                width="2"),
-                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media', width="2"),
+                                col_args={'lg': 2, 'md': 4, 'sm': 6}),
+                create_dropdown("Frequenza Raccolta", "dd-frequenza-raccolta", OPTIONS_RACCOLTA, 'media', col_args={'lg': 2, 'md': 4, 'sm': 6}),
                 create_dropdown("Impollinazione", "dd-impollinazione", OPTIONS_IMPOLLINAZIONE, 'bombi',
-                                info_button_id="btn-info-impollinazione", width="2"),
-            ], className="mb-3"),
+                                info_button_id="btn-info-impollinazione", col_args={'lg': 2, 'md': 4, 'sm': 6}),
+            ]),
             dbc.Row([
-                create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia', width="4"),
+                create_dropdown("Irrigazione", "dd-irrigazione", OPTIONS_IRRIGAZIONE, 'goccia', col_args={'lg': 2, 'md': 4, 'sm': 6}),
                 create_dropdown("Controllo Patogeni", "dd-patogeni", OPTIONS_PATOGENI, 'integrata',
-                                info_button_id="btn-info-patogeni", width="4"),
+                                info_button_id="btn-info-patogeni", col_args={'lg': 2, 'md': 4, 'sm': 6}),
                 create_dropdown("Sistema di Coltura", "dd-sistema-colturale", OPTIONS_SISTEMA, 'suolo_tradizionale',
-                                info_button_id="btn-info-coltura", width="4")
-            ], className="mb-3"),
+                                info_button_id="btn-info-coltura", col_args={'lg': 2, 'md': 4, 'sm': 6})
+            ]),
         ]),
         className="mb-4 dropdown-panel-card"
     ),
@@ -120,7 +121,7 @@ layout = dbc.Container([
                 dbc.Button("Soilless", id="btn-preset-soilless", n_clicks=0, className="custom-button-green"),
                 dbc.Button("Idroponica", id="btn-preset-idroponica", n_clicks=0, className="custom-button-green"),
             ])
-        ], width=5),
+        ], lg=5, md=12, className="mb-3 mb-lg-0"),
 
         # Preset per condizioni sfavorevoli/medie/ottimali
         dbc.Col([
@@ -130,13 +131,16 @@ layout = dbc.Container([
                 dbc.Button("Medie", id="btn-preset-medie", n_clicks=0, className="custom-button-green"),
                 dbc.Button("Ottimali", id="btn-preset-ottimali", n_clicks=0, className="custom-button-green"),
             ])
-        ], width=5),
+        ], lg=5, md=12, className="mb-3 mb-lg-0"),
 
         # Pulsante Distribuzione Mensile
         dbc.Col([
-            dbc.Button("Distribuzione Mensile", id="btn-distribuzione-mensile", n_clicks=0,
-                       className="custom-button-green")
-        ], width=2)
+            html.Div(
+                dbc.Button("Distribuzione Mensile", id="btn-distribuzione-mensile", n_clicks=0,
+                           className="custom-button-green w-100"),
+                className="d-grid"
+            )
+        ], lg=2, md=12)
     ], align="end", className="mb-4"),
 
     html.Hr(),
@@ -155,7 +159,7 @@ layout = dbc.Container([
                     html.Hr(),
                     dcc.Markdown(id="testo-commentary",
                                  children="*Seleziona una vista o modifica i parametri per visualizzare l'analisi...*")
-                ], width=4,style={'maxHeight': '700px', 'overflowY': 'auto', 'paddingRight': '15px'}, className="explanation-column"),
+                ], lg=4, md=12, style={'maxHeight': '700px', 'overflowY': 'auto', 'paddingRight': '15px'}, className="explanation-column mb-4 mb-lg-0"),
 
                 # Colonna destra per il plot dei diversi grafici
                 dbc.Col([
@@ -184,34 +188,32 @@ layout = dbc.Container([
                                         dbc.Col([
                                             html.Label("Costo Acqua (€/m³)", className="form-label"),
                                             dcc.Input(id='input-costo-acqua', type='number', value=1.00, step=0.01, className="form-control")
-                                        ], width=3),
+                                        ], lg=3, md=6, sm=12, className="mb-3"),
                                         dbc.Col([
                                             html.Label("Costo Fertilizzanti (€/kg)", className="form-label"),
                                             dcc.Input(id='input-costo-fertilizzanti', type='number', value=2.50, step=0.01, className="form-control")
-                                        ], width=3),
+                                        ], lg=3, md=6, sm=12, className="mb-3"),
                                         dbc.Col([
                                             html.Label("Altri Costi Variabili (€/Ha)", className="form-label"),
                                             dcc.Input(id='input-costi-extra', type='number', value=5000, step=100, className="form-control")
-                                        ], width=3),
+                                        ], lg=3, md=6, sm=12, className="mb-3"),
                                         dbc.Col([
                                             html.Label("Prezzo di Vendita (€/kg)", className="form-label"),
                                             dcc.Input(id='input-prezzo-vendita', type='number', value=3.50, step=0.05, className="form-control")
-                                        ], width=3)
+                                        ], lg=3, md=6, sm=12, className="mb-3")
                                     ]),
                                 ]),
                                 className="mb-4",
                             ),
                             dbc.Row([
                                 dbc.Col(dcc.Graph(id='grafico-sankey-finanziario',
-                                                  # animate=True
-                                                  ), width=6),
+                                                  ), lg=6, md=12),
                                 dbc.Col(dcc.Graph(id='grafico-composizione-costi',
-                                                  # animate=True
-                                                  ), width=6)
-                            ], style={'height': '50vh'})
+                                                  ), lg=6, md=12)
+                            ])
                         ]
                     ),
-                ], width=8, className="p-3")
+                ], lg=8, md=12, className="p-3")
             ])
         ]),
         className="main-content-card"
