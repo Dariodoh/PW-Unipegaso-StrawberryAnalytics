@@ -177,7 +177,8 @@ layout = dbc.Container([
                         id='container-produttivo',
                         style={'display': 'block', 'width': '100%'},
                         children=[
-                            dcc.Graph(id='grafico-produttivo', style={'height': '50vh'}, animate=True)
+                            dcc.Graph(id='grafico-produttivo', style={'height': '50vh'}, animate=True,
+                                      config={'displayModeBar': False})
                         ],
                         role="figure",
                         **{
@@ -189,7 +190,8 @@ layout = dbc.Container([
                         id='container-risorse',
                         style={'display': 'none', 'width': '100%'},
                         children=[
-                            dcc.Graph(id='grafico-risorse', style={'height': '50vh'}, animate=True)
+                            dcc.Graph(id='grafico-risorse', style={'height': '50vh'}, animate=True,
+                                      config={'displayModeBar': False})
                         ],
                         role="figure",
                         **{
@@ -233,14 +235,14 @@ layout = dbc.Container([
                                 dbc.Col(
                                     html.Div([
                                         dcc.Graph(id='grafico-sankey-finanziario',
-                                                  )],
+                                                  config={'displayModeBar': False})],
                                         role="figure",
                                         **{"aria-label": "Diagramma di Sankey che mostra i flussi di costi e ricavi."}
                                     ), lg=6, md=12, ),
                                 dbc.Col(
                                     html.Div([
                                         dcc.Graph(id='grafico-composizione-costi',
-                                                  )],
+                                                  config={'displayModeBar': False})],
                                         role="figure",
                                         **{"aria-label": "Grafico a torta che mostra la composizione dei costi."}
                                     ), lg=6, md=12,
