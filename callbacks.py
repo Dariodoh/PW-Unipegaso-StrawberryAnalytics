@@ -240,7 +240,6 @@ def update_dropdowns_from_preset(*button_clicks):
 
 # Chiamata di aggiornamento tab per commento grafico dinamico e plot grafici
 @app.callback(
-    # Aggiorniamo le figure
     [
         Output('grafico-produttivo', 'figure'),
         Output('grafico-risorse', 'figure'),
@@ -413,16 +412,31 @@ def update_main_view(active_tab,
             gauge_fert_range = [0, 0.030]
             fert_threshold_value = 0.0125
 
-        fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumo_acqua_simulato, uid='gauge-acqua-uid',
-                                           gauge={'axis': {'range': gauge_acqua_range}, 'bar': {'color': "#495b52"},
+        fig_risorse.add_trace(go.Indicator(mode="gauge+number", value=consumo_acqua_simulato, uid='gauge-acqua-background-uid',
+                                           gauge={'shape': "angular",
+                                               'axis': {'range': gauge_acqua_range},
                                                   'steps': gauge_acqua_steps,
-                                                  'threshold': {'value': acqua_threshold_value}}), row=1, col=1)
+                                                  }), row=1, col=1)
+        fig_risorse.add_trace(go.Indicator(mode="gauge", value=consumo_acqua_simulato, uid='gauge-acqua-bar-uid',
+                                           gauge={'shape': "angular",
+                                               'axis': {'range': gauge_acqua_range}, 'bar': {'color': "#495b52"},
+                                                  'threshold': {'value': acqua_threshold_value}
+                                                  }), row=1, col=1)
         fig_risorse.add_trace(
-            go.Indicator(mode="gauge+number", value=consumo_fertilizzanti_simulato, uid='gauge-fert-uid',
+            go.Indicator(mode="gauge+number", value=consumo_fertilizzanti_simulato, uid='gauge-fert-background-uid',
                          number={'valueformat': '.3f'},
-                         gauge={'axis': {'range': gauge_fert_range}, 'bar': {'color': "#495b52"},
+                         gauge={'shape': "angular",
+                             'axis': {'range': gauge_fert_range},
                                 'steps': gauge_fert_steps,
-                                'threshold': {'value': fert_threshold_value}}), row=1, col=2)
+                                }), row=1, col=2)
+        fig_risorse.add_trace(
+            go.Indicator(mode="gauge", value=consumo_fertilizzanti_simulato, uid='gauge-fert-bar-uid',
+                         #number={'valueformat': '.3f'},
+                         gauge={'shape': "angular",
+                             'axis': {'range': gauge_fert_range}, 'bar': {'color': "#495b52"},
+                                #'steps': gauge_fert_steps,
+                                'threshold': {'value': fert_threshold_value}
+                                }), row=1, col=2)
 
         fig_risorse.update_layout(title_text="Stima del Consumo di Risorse", plot_bgcolor='rgba(0,0,0,0)',
                                   paper_bgcolor='rgba(0,0,0,0)', font=dict(color='#495b52'), title_x=0.5,
